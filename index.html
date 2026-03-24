@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fast Authenticator</title>
+    
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FastAuth">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzFlMjkzYiIgcng9IjExMiIvPjxwYXRoIGQ9Ik0yNTYgMTYwYy0zNS4zIDAtNjQgMjguNy02NCA2NHYzMmgxMjh2LTMyYzAtMzUuMy0yOC43LTY0LTY0LTY0em0xMTIgOTZWMjI0YzAtNjEuOS01MC4xLTExMi0xMTItMTEyUzE0NCAxNjIuMSAxNDQgMjI0djMyYy0yNi41IDAtNDggMjEuNS00OCA0OHYxMjhjMCAyNi41IDIxLjUgNDggNDggNDhoMjI0YzI2LjUgMCA0OC0yMS41IDQ4LTQ4VjMwNGMwLTI2LjUtMjEuNS00OC00OC00OHptLTExMiAxMTJjLTE3LjcgMC0zMi0xNC4zLTMyLTMyczE0LjMtMzIgMzItMzIgMzIgMTQuMyAzMiAzMi0xNC4zIDMyLTMyIDMyeiIgZmlsbD0iIzNiODJmNiIvPjwvc3ZnPg==">
+    
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiRmFzdCBBdXRoZW50aWNhdG9yIiwic2hvcnRfbmFtZSI6IkZhc3RBdXRoIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzBmMTcyYSIsInRoZW1lX2NvbG9yIjoiIzBmMTcyYSIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBIUjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSFpwWlhOQ2IzZzlJakFnTUNBMU1USWdOVEV5SWo0OGNtVmpkQ0IzYVdSMGFEMGlOVEV5SWlCb1pXbG5hSFE5SWpVeE1pSWdaR2xzYkQwaUkyRmpaR1ZoSWlCeWVEMGlNVEV5SWk4K1BISnlaV04wSUhka2IzSmtQWE5wWjI1bExtVjRjRzFsYm5RckxUaDhjSEJvWlhNZ0lHeGxjRzl6YVc1bkxpNGlQZ3B6ZEdWdFpYSWdibWwwWlY5bWIzSnRJRDBpUEhCMFlXZ2daRDBpT1RreUlpdytQQzl6ZG1jKyIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
+
+    <style>
+        :root {
+            --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc;
+            --text-muted: #94a3b8; --accent: #3b82f6; --accent-glow: rgba(59, 130, 246, 0.4);
+            --danger: #ef4444; --success: #10b981;
+        }
+        body {
+            margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color); color: var(--text-main); display: flex;
+            justify-content: center; align-items: center; height: 100vh; -webkit-tap-highlight-color: transparent;
+        }
+        .auth-card {
+            background-color: var(--card-bg); padding: 2.5rem 3rem; border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.5);
+            text-align: center; max-width: 400px; width: 90%; box-sizing: border-box;
+        }
+        .auth-title { margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 600; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+        .auth-code {
+            font-size: 3.5rem; font-weight: 700; letter-spacing: 4px; margin: 1.5rem 0 0.25rem 0;
+            color: var(--accent); text-shadow: 0 0 20px var(--accent-glow); font-variant-numeric: tabular-nums;
+            cursor: pointer; transition: transform 0.1s ease, color 0.3s ease; user-select: none;
+        }
+        .auth-code:active { transform: scale(0.95); }
+        .auth-code.copied { color: var(--success); text-shadow: 0 0 20px rgba(16, 185, 129, 0.4); font-size: 2.5rem; letter-spacing: 2px; padding: 0.5rem 0; }
+        .auth-code-next { font-size: 1.5rem; font-weight: 500; letter-spacing: 2px; margin: 0 0 1.5rem 0; color: var(--text-muted); opacity: 0.25; font-variant-numeric: tabular-nums; }
+        .auth-error { font-size: 1rem; color: var(--danger); margin-bottom: 1rem; display: none; }
+        .timer-container { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1rem; }
+        .progress-bg { background-color: #334155; height: 8px; width: 100%; border-radius: 4px; overflow: hidden; position: relative; }
+        .progress-bar { background-color: var(--accent); height: 100%; width: 100%; border-radius: 4px; transition: width 1s linear, background-color 0.3s ease; }
+        .progress-bar.warning { background-color: var(--danger); }
+        .time-text { font-size: 1.1rem; font-weight: 500; color: var(--text-muted); min-width: 40px; }
+        .secret-info { margin-top: 2rem; font-size: 0.85rem; color: #64748b; word-break: break-all; }
+        .input-group { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+        .secret-input { width: 100%; padding: 0.75rem 1rem; border: 1px solid #334155; border-radius: 0.5rem; background-color: var(--bg-color); color: var(--text-main); font-size: 1rem; box-sizing: border-box; text-align: center; }
+        .secret-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+        .submit-btn { width: 100%; padding: 0.75rem 1rem; border: none; border-radius: 0.5rem; background-color: var(--accent); color: white; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
+        .submit-btn:hover { background-color: #2563eb; }
+        .reset-link { display: inline-block; margin-top: 1rem; color: var(--text-muted); text-decoration: none; font-size: 0.85rem; }
+        .reset-link:hover { color: var(--text-main); }
+        
+        #view-code, #view-input { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <h1 class="auth-title">Fast Authenticator</h1>
+        <div id="error-msg" class="auth-error">Invalid Secret Key Format.</div>
+
+        <div id="view-code">
+            <div class="auth-code" id="code-display" title="Click to copy">------</div>
+            <div class="auth-code-next" id="code-next-display">------</div>
+            
+            <div class="timer-container">
+                <div class="progress-bg"><div class="progress-bar" id="progress-bar"></div></div>
+                <div class="time-text"><span id="time-left">30</span>s</div>
+            </div>
+
+            <div class="secret-info" id="secret-display"></div>
+            <a href="?" class="reset-link">Enter a different key</a>
+        </div>
+
+        <div id="view-input">
+            <form id="secret-form" class="input-group">
+                <input type="text" id="secret-input" class="secret-input" placeholder="Enter your secret key" required autocomplete="off">
+                <button type="submit" class="submit-btn">Generate Code</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 1. Base32 Decoder
+        function base32decode(base32) {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+            base32 = base32.replace(/[^A-Z2-7]/gi, '').toUpperCase();
+            if (base32.length === 0) return null;
+            const bytes = new Uint8Array(Math.floor((base32.length * 5) / 8));
+            let bits = 0, value = 0, index = 0;
+            for (let i = 0; i < base32.length; i++) {
+                value = (value << 5) | alphabet.indexOf(base32[i]);
+                bits += 5;
+                if (bits >= 8) {
+                    bytes[index++] = (value >>> (bits - 8)) & 255;
+                    bits -= 8;
+                }
+            }
+            return bytes;
+        }
+
+        // 2. Web Crypto TOTP Generator
+        async function generateTOTP(secret, offset = 0) {
+            const keyBytes = base32decode(secret);
+            if (!keyBytes) return null;
+
+            const timeStep = Math.floor(Date.now() / 1000 / 30) + offset;
+            const timeBytes = new ArrayBuffer(8);
+            new DataView(timeBytes).setUint32(4, timeStep, false);
+
+            const cryptoKey = await crypto.subtle.importKey('raw', keyBytes, { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']);
+            const signature = await crypto.subtle.sign('HMAC', cryptoKey, timeBytes);
+            const hmac = new Uint8Array(signature);
+
+            const offsetByte = hmac[hmac.length - 1] & 0xf;
+            const binary = ((hmac[offsetByte] & 0x7f) << 24) | ((hmac[offsetByte + 1] & 0xff) << 16) | ((hmac[offsetByte + 2] & 0xff) << 8) | (hmac[offsetByte + 3] & 0xff);
+            
+            return (binary % 1000000).toString().padStart(6, '0');
+        }
+
+        // 3. UI and Logic Controller
+        const secretKey = decodeURIComponent(window.location.search.substring(1).trim());
+        let rawCurrentCode = "";
+
+        if (secretKey) {
+            document.getElementById('view-code').style.display = 'block';
+            document.getElementById('secret-display').innerText = `Secret: ${secretKey}`;
+
+            async function updateCodes() {
+                const current = await generateTOTP(secretKey, 0);
+                const next = await generateTOTP(secretKey, 1);
+                
+                if (!current) {
+                    document.getElementById('view-code').style.display = 'none';
+                    document.getElementById('view-input').style.display = 'block';
+                    document.getElementById('error-msg').style.display = 'block';
+                    return;
+                }
+
+                rawCurrentCode = current;
+                document.getElementById('code-display').innerText = current.slice(0, 3) + ' ' + current.slice(3, 6);
+                document.getElementById('code-next-display').innerText = next.slice(0, 3) + ' ' + next.slice(3, 6);
+            }
+
+            function updateTimer() {
+                const now = Math.floor(Date.now() / 1000);
+                const timeLeft = 30 - (now % 30);
+                
+                document.getElementById('time-left').innerText = timeLeft;
+                const progressBar = document.getElementById('progress-bar');
+                progressBar.style.width = (timeLeft / 30 * 100) + '%';
+                
+                timeLeft <= 5 ? progressBar.classList.add('warning') : progressBar.classList.remove('warning');
+                if (timeLeft === 30) updateCodes(); // Seamless update without reloading the page!
+            }
+
+            updateCodes();
+            updateTimer();
+            setInterval(updateTimer, 1000);
+
+            // Click-to-Copy
+            const codeDisplay = document.getElementById('code-display');
+            let copyTimeout;
+            codeDisplay.addEventListener('click', async () => {
+                const originalHTML = codeDisplay.innerHTML;
+                try {
+                    await navigator.clipboard.writeText(rawCurrentCode);
+                    codeDisplay.innerText = 'COPIED!';
+                    codeDisplay.classList.add('copied');
+                    clearTimeout(copyTimeout);
+                    copyTimeout = setTimeout(() => { codeDisplay.innerHTML = originalHTML; codeDisplay.classList.remove('copied'); }, 1500);
+                } catch (err) { alert('Browser blocked clipboard access.'); }
+            });
+
+        } else {
+            document.getElementById('view-input').style.display = 'block';
+            document.getElementById('secret-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const val = document.getElementById('secret-input').value.trim();
+                if (val) window.location.href = window.location.pathname + '?' + encodeURIComponent(val);
+            });
+        }
+    </script>
+</body>
+</html>
