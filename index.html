@@ -20,14 +20,18 @@
             --danger: #ef4444; --success: #10b981;
         }
         body {
-            margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color); color: var(--text-main); display: flex;
-            justify-content: center; align-items: center; height: 100vh; -webkit-tap-highlight-color: transparent;
+            margin: 0; padding: 2rem 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; min-height: 100vh; -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
         }
         .auth-card {
             background-color: var(--card-bg); padding: 2.5rem 3rem; border-radius: 1.5rem;
             box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.5);
             text-align: center; max-width: 400px; width: 90%; box-sizing: border-box;
+        }
+        .small-card {
+            margin-top: 1.5rem; padding: 1.5rem 2rem;
         }
         .auth-title { margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 600; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
         .auth-code {
@@ -48,8 +52,25 @@
         .input-group { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
         .secret-input { width: 100%; padding: 0.75rem 1rem; border: 1px solid #334155; border-radius: 0.5rem; background-color: var(--bg-color); color: var(--text-main); font-size: 1rem; box-sizing: border-box; text-align: center; }
         .secret-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+        
+        /* Button Styles */
         .submit-btn { width: 100%; padding: 0.75rem 1rem; border: none; border-radius: 0.5rem; background-color: var(--accent); color: white; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
         .submit-btn:hover { background-color: #2563eb; }
+        
+        /* Saved Accounts Row Styles */
+        .account-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .btn-saved { flex-grow: 1; margin-bottom: 0; background-color: #334155; }
+        .btn-saved:hover { background-color: #475569; }
+        
+        /* Updated Delete Button */
+        .btn-delete { 
+            width: 44px; background-color: #334155; border: none; 
+            color: var(--danger); border-radius: 0.5rem; cursor: pointer; 
+            font-size: 1.5rem; display: flex; align-items: center; justify-content: center; 
+            transition: all 0.2s; opacity: 0.9;
+        }
+        .btn-delete:hover { background-color: rgba(239, 68, 68, 0.15); opacity: 1; }
+
         .reset-link { display: inline-block; margin-top: 1rem; color: var(--text-muted); text-decoration: none; font-size: 0.85rem; }
         .reset-link:hover { color: var(--text-main); }
         
@@ -81,6 +102,22 @@
                 <button type="submit" class="submit-btn">Generate Code</button>
             </form>
         </div>
+    </div>
+
+    <div class="auth-card small-card" id="save-card" style="display: none;">
+        <div class="auth-title" style="font-size: 1rem;">Save to this device</div>
+        <form id="save-form" class="input-group" style="margin-top: 1rem;">
+            <input type="text" id="save-name" class="secret-input" placeholder="Account Name (e.g. Work Email)" required autocomplete="off">
+            <button type="submit" class="submit-btn" style="background-color: var(--success);">Save Account</button>
+        </form>
+        <div id="save-msg" style="color: var(--success); display: none; margin-top: 1rem; font-size: 0.95rem; font-weight: 500;">Account saved successfully!</div>
+    </div>
+
+    <div class="auth-card small-card" id="load-card" style="display: none;">
+        <div class="auth-title" style="font-size: 1rem;">Saved Accounts</div>
+        <div id="saved-accounts-list" class="input-group" style="margin-top: 1rem;">
+            </div>
+        <a href="#" id="clear-saved" class="reset-link" style="color: var(--danger); opacity: 0.8; margin-top: 1.5rem;">Clear all saved accounts</a>
     </div>
 
     <script>
@@ -126,8 +163,10 @@
         let rawCurrentCode = "";
 
         if (secretKey) {
+            // STATE: Viewing a code
             document.getElementById('view-code').style.display = 'block';
             document.getElementById('secret-display').innerText = `Secret: ${secretKey}`;
+            document.getElementById('save-card').style.display = 'block';
 
             async function updateCodes() {
                 const current = await generateTOTP(secretKey, 0);
@@ -135,6 +174,7 @@
                 
                 if (!current) {
                     document.getElementById('view-code').style.display = 'none';
+                    document.getElementById('save-card').style.display = 'none';
                     document.getElementById('view-input').style.display = 'block';
                     document.getElementById('error-msg').style.display = 'block';
                     return;
@@ -154,14 +194,14 @@
                 progressBar.style.width = (timeLeft / 30 * 100) + '%';
                 
                 timeLeft <= 5 ? progressBar.classList.add('warning') : progressBar.classList.remove('warning');
-                if (timeLeft === 30) updateCodes(); // Seamless update without reloading the page!
+                if (timeLeft === 30) updateCodes(); 
             }
 
             updateCodes();
             updateTimer();
             setInterval(updateTimer, 1000);
 
-            // Click-to-Copy
+            // Click-to-Copy functionality
             const codeDisplay = document.getElementById('code-display');
             let copyTimeout;
             codeDisplay.addEventListener('click', async () => {
@@ -175,12 +215,85 @@
                 } catch (err) { alert('Browser blocked clipboard access.'); }
             });
 
+            // Save Account functionality
+            document.getElementById('save-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('save-name').value.trim();
+                if (name && secretKey) {
+                    let accounts = JSON.parse(localStorage.getItem('fastAuthAccounts') || '[]');
+                    // Prevent duplicates of the same secret
+                    accounts = accounts.filter(a => a.secret !== secretKey);
+                    accounts.push({ name: name, secret: secretKey });
+                    localStorage.setItem('fastAuthAccounts', JSON.stringify(accounts));
+                    
+                    document.getElementById('save-form').style.display = 'none';
+                    document.getElementById('save-msg').style.display = 'block';
+                }
+            });
+
         } else {
+            // STATE: Home Page (No code active)
             document.getElementById('view-input').style.display = 'block';
+            
             document.getElementById('secret-form').addEventListener('submit', function(e) {
                 e.preventDefault();
                 const val = document.getElementById('secret-input').value.trim();
                 if (val) window.location.href = window.location.pathname + '?' + encodeURIComponent(val);
+            });
+
+            // Load Saved Accounts functionality
+            let accounts = JSON.parse(localStorage.getItem('fastAuthAccounts') || '[]');
+            
+            function renderSavedAccounts() {
+                const list = document.getElementById('saved-accounts-list');
+                list.innerHTML = ''; // Clear current list
+                
+                if (accounts.length > 0) {
+                    document.getElementById('load-card').style.display = 'block';
+                    
+                    accounts.forEach((acc, index) => {
+                        const row = document.createElement('div');
+                        row.className = 'account-row';
+                        
+                        // Main Launch Button
+                        const btn = document.createElement('button');
+                        btn.className = 'submit-btn btn-saved';
+                        btn.innerText = acc.name;
+                        btn.onclick = () => window.location.href = window.location.pathname + '?' + encodeURIComponent(acc.secret);
+                        
+                        // Delete Button (The Red X)
+                        const delBtn = document.createElement('button');
+                        delBtn.className = 'btn-delete';
+                        delBtn.innerHTML = '&times;';
+                        delBtn.title = 'Delete account';
+                        delBtn.onclick = (e) => {
+                            e.stopPropagation(); // Prevents accidental clicks on the row
+                            if (confirm(`Are you sure you want to remove "${acc.name}"?`)) {
+                                accounts.splice(index, 1); // Remove from array
+                                localStorage.setItem('fastAuthAccounts', JSON.stringify(accounts)); // Update storage
+                                renderSavedAccounts(); // Re-draw the list instantly
+                            }
+                        };
+                        
+                        row.appendChild(btn);
+                        row.appendChild(delBtn);
+                        list.appendChild(row);
+                    });
+                } else {
+                    document.getElementById('load-card').style.display = 'none';
+                }
+            }
+
+            renderSavedAccounts();
+
+            // Clear All Saved Accounts functionality
+            document.getElementById('clear-saved').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('Are you sure you want to delete ALL saved accounts from this browser?')) {
+                    accounts = [];
+                    localStorage.removeItem('fastAuthAccounts');
+                    renderSavedAccounts();
+                }
             });
         }
     </script>
