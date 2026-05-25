@@ -1,301 +1,3320 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fast Authenticator</title>
-    
-    <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="FastAuth">
-    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzFlMjkzYiIgcng9IjExMiIvPjxwYXRoIGQ9Ik0yNTYgMTYwYy0zNS4zIDAtNjQgMjguNy02NCA2NHYzMmgxMjh2LTMyYzAtMzUuMy0yOC43LTY0LTY0LTY0em0xMTIgOTZWMjI0YzAtNjEuOS01MC4xLTExMi0xMTItMTEyUzE0NCAxNjIuMSAxNDQgMjI0djMyYy0yNi41IDAtNDggMjEuNS00OCA0OHYxMjhjMCAyNi41IDIxLjUgNDggNDggNDhoMjI0YzI2LjUgMCA0OC0yMS41IDQ4LTQ4VjMwNGMwLTI2LjUtMjEuNS00OC00OC00OHptLTExMiAxMTJjLTE3LjcgMC0zMi0xNC4zLTMyLTMyczE0LjMtMzIgMzItMzIgMzIgMTQuMyAzMiAzMi0xNC4zIDMyLTMyIDMyeiIgZmlsbD0iIzNiODJmNiIvPjwvc3ZnPg==">
-    
-    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiRmFzdCBBdXRoZW50aWNhdG9yIiwic2hvcnRfbmFtZSI6IkZhc3RBdXRoIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzBmMTcyYSIsInRoZW1lX2NvbG9yIjoiIzBmMTcyYSIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBIUjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSFpwWlhOQ2IzZzlJakFnTUNBMU1USWdOVEV5SWo0OGNtVmpkQ0IzYVdSMGFEMGlOVEV5SWlCb1pXbG5hSFE5SWpVeE1pSWdaR2xzYkQwaUkyRmpaR1ZoSWlCeWVEMGlNVEV5SWk4K1BISnlaV04wSUhka2IzSmtQWE5wWjI1bExtVjRjRzFsYm5RckxUaDhjSEJvWlhNZ0lHeGxjRzl6YVc1bkxpNGlQZ3B6ZEdWdFpYSWdibWwwWlY5bWIzSnRJRDBpUEhCMFlXZ2daRDBpT1RreUlpdytQQzl6ZG1jKyIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Fast Authenticator</title>
+  
+  <!-- SEO & Social Meta -->
+  <meta name="description" content="A radically simple, single-file client-side TOTP 2FA code generator. Complete privacy: keys never leave your browser.">
+  <meta property="og:title" content="Fast Authenticator">
+  <meta property="og:description" content="100% client-side, zero-login, secure and lightweight 2FA authenticator.">
+  <meta property="og:type" content="website">
+  
+  <!-- Apple Mobile Web App Settings -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Fast2FA">
+  
+  <!-- Stylesheet -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-    <style>
-        :root {
-            --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc;
-            --text-muted: #94a3b8; --accent: #3b82f6; --accent-glow: rgba(59, 130, 246, 0.4);
-            --danger: #ef4444; --success: #10b981;
-        }
-        body {
-            margin: 0; padding: 2rem 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column;
-            justify-content: center; align-items: center; min-height: 100vh; -webkit-tap-highlight-color: transparent;
-            box-sizing: border-box;
-        }
-        .auth-card {
-            background-color: var(--card-bg); padding: 2.5rem 3rem; border-radius: 1.5rem;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.5);
-            text-align: center; max-width: 400px; width: 90%; box-sizing: border-box;
-        }
-        .small-card {
-            margin-top: 1.5rem; padding: 1.5rem 2rem;
-        }
-        .auth-title { margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 600; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
-        .auth-code {
-            font-size: 3.5rem; font-weight: 700; letter-spacing: 4px; margin: 1.5rem 0 0.25rem 0;
-            color: var(--accent); text-shadow: 0 0 20px var(--accent-glow); font-variant-numeric: tabular-nums;
-            cursor: pointer; transition: transform 0.1s ease, color 0.3s ease; user-select: none;
-        }
-        .auth-code:active { transform: scale(0.95); }
-        .auth-code.copied { color: var(--success); text-shadow: 0 0 20px rgba(16, 185, 129, 0.4); font-size: 2.5rem; letter-spacing: 2px; padding: 0.5rem 0; }
-        .auth-code-next { font-size: 1.5rem; font-weight: 500; letter-spacing: 2px; margin: 0 0 1.5rem 0; color: var(--text-muted); opacity: 0.25; font-variant-numeric: tabular-nums; }
-        .auth-error { font-size: 1rem; color: var(--danger); margin-bottom: 1rem; display: none; }
-        .timer-container { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1rem; }
-        .progress-bg { background-color: #334155; height: 8px; width: 100%; border-radius: 4px; overflow: hidden; position: relative; }
-        .progress-bar { background-color: var(--accent); height: 100%; width: 100%; border-radius: 4px; transition: width 1s linear, background-color 0.3s ease; }
-        .progress-bar.warning { background-color: var(--danger); }
-        .time-text { font-size: 1.1rem; font-weight: 500; color: var(--text-muted); min-width: 40px; }
-        .secret-info { margin-top: 2rem; font-size: 0.85rem; color: #64748b; word-break: break-all; }
-        .input-group { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
-        .secret-input { width: 100%; padding: 0.75rem 1rem; border: 1px solid #334155; border-radius: 0.5rem; background-color: var(--bg-color); color: var(--text-main); font-size: 1rem; box-sizing: border-box; text-align: center; }
-        .secret-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
-        
-        /* Button Styles */
-        .submit-btn { width: 100%; padding: 0.75rem 1rem; border: none; border-radius: 0.5rem; background-color: var(--accent); color: white; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
-        .submit-btn:hover { background-color: #2563eb; }
-        
-        /* Saved Accounts Row Styles */
-        .account-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
-        .btn-saved { flex-grow: 1; margin-bottom: 0; background-color: #334155; }
-        .btn-saved:hover { background-color: #475569; }
-        
-        /* Updated Delete Button */
-        .btn-delete { 
-            width: 44px; background-color: #334155; border: none; 
-            color: var(--danger); border-radius: 0.5rem; cursor: pointer; 
-            font-size: 1.5rem; display: flex; align-items: center; justify-content: center; 
-            transition: all 0.2s; opacity: 0.9;
-        }
-        .btn-delete:hover { background-color: rgba(239, 68, 68, 0.15); opacity: 1; }
+    :root {
+      --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      
+      /* Dark Theme variables (default) */
+      --bg-primary: #07080d;
+      --bg-gradient: radial-gradient(circle at 50% 50%, #131026 0%, #07080d 100%);
+      --card-bg: rgba(16, 18, 30, 0.65);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover-border: rgba(99, 102, 241, 0.4);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      
+      --accent-primary: #6366f1; /* Indigo */
+      --accent-secondary: #a855f7; /* Purple */
+      --accent-cyan: #06b6d4; /* Cyan */
+      --accent-gradient: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      
+      --color-success: #10b981;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+      --color-shadow: rgba(0, 0, 0, 0.5);
+      --btn-bg: rgba(255, 255, 255, 0.06);
+      --btn-hover: rgba(255, 255, 255, 0.12);
+      
+      --ring-bg: rgba(255, 255, 255, 0.06);
+      --glass-blur: blur(20px);
+    }
 
-        .reset-link { display: inline-block; margin-top: 1rem; color: var(--text-muted); text-decoration: none; font-size: 0.85rem; }
-        .reset-link:hover { color: var(--text-main); }
-        
-        #view-code, #view-input { display: none; }
-    </style>
+    [data-theme="light"] {
+      --bg-primary: #f8fafc;
+      --bg-gradient: radial-gradient(circle at 50% 50%, #e2e8f0 0%, #f8fafc 100%);
+      --card-bg: rgba(255, 255, 255, 0.75);
+      --card-border: rgba(15, 23, 42, 0.06);
+      --card-hover-border: rgba(79, 70, 229, 0.3);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      
+      --accent-primary: #4f46e5;
+      --accent-secondary: #9333ea;
+      --accent-cyan: #0891b2;
+      --accent-gradient: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      
+      --color-success: #059669;
+      --color-warning: #d97706;
+      --color-danger: #dc2626;
+      --color-shadow: rgba(15, 23, 42, 0.08);
+      --btn-bg: rgba(15, 23, 42, 0.05);
+      --btn-hover: rgba(15, 23, 42, 0.1);
+      
+      --ring-bg: rgba(15, 23, 42, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background: var(--bg-primary);
+      background-image: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 16px;
+      overflow-x: hidden;
+    }
+
+    /* Core Container Layout */
+    .app-container {
+      width: 100%;
+      max-width: 540px;
+      margin: 32px 0 64px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .app-container {
+        margin: 16px 0 48px 0;
+        gap: 16px;
+      }
+    }
+
+    /* Premium Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 16px 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      box-shadow: 0 8px 32px var(--color-shadow);
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+    }
+
+    .brand-info h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 0%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    [data-theme="light"] .brand-info h1 {
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-info span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: block;
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* IconButton Style */
+    .btn-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      background: var(--btn-bg);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
+      will-change: transform, background-color, border-color;
+    }
+
+    .btn-icon:hover {
+      background: var(--btn-hover);
+      border-color: var(--card-hover-border);
+    }
+
+    .btn-icon:active {
+      transform: scale(0.95);
+    }
+
+    .btn-icon svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    /* Primary Accent Button */
+    .btn-primary {
+      padding: 0 20px;
+      height: 44px;
+      border-radius: 12px;
+      border: none;
+      background: var(--accent-gradient);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
+      white-space: nowrap;
+      flex-shrink: 0;
+      will-change: transform, box-shadow;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+      filter: brightness(1.05);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    /* Secondary / Plain buttons */
+    .btn-secondary {
+      padding: 0 20px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      background: var(--btn-bg);
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+      white-space: nowrap;
+      flex-shrink: 0;
+      will-change: transform, background-color, border-color;
+    }
+
+    .btn-secondary:hover {
+      background: var(--btn-hover);
+      border-color: var(--card-hover-border);
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.97);
+    }
+
+    .btn-secondary svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    /* Temporary Account Card / Banner */
+    .temp-banner {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      animation: slideDown 0.4s ease;
+    }
+
+    .temp-banner-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+
+    .temp-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .temp-actions button {
+      flex: 1;
+    }
+
+    /* Search and Filter Panel */
+    .search-panel {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 48px;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text-primary);
+      padding: 0 20px 0 46px;
+      font-family: var(--font-main);
+      font-size: 0.95rem;
+      font-weight: 500;
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 20px var(--color-shadow);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2), 0 4px 20px var(--color-shadow);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+    
+    .badge-count {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: var(--btn-bg);
+      padding: 4px 8px;
+      border-radius: 8px;
+    }
+
+    /* Accounts Grid */
+    .accounts-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Interactive Account Card */
+    .account-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      box-shadow: 0 8px 32px var(--color-shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+      will-change: transform, border-color, box-shadow;
+    }
+
+    .account-card:hover {
+      border-color: var(--card-hover-border);
+      box-shadow: 0 12px 40px var(--color-shadow);
+    }
+
+    .account-card:active {
+      transform: scale(0.99);
+    }
+
+    .account-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .account-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: #ffffff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px var(--color-shadow);
+    }
+
+    .account-details {
+      min-width: 0;
+    }
+
+    .issuer-name {
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: -0.3px;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .account-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+
+    .code-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .pin-code {
+      font-family: monospace;
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--accent-cyan);
+      cursor: pointer;
+      user-select: all;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .code-gap {
+      display: inline-block;
+      width: 0.25em;
+    }
+
+    .pin-code.copied {
+      color: var(--color-success) !important;
+      text-shadow: 0 0 8px rgba(16, 185, 129, 0.4) !important;
+      font-size: 1.4rem !important;
+      letter-spacing: 0 !important;
+    }
+
+    .next-pin.copied {
+      color: var(--color-success) !important;
+      font-weight: 700;
+    }
+
+    /* Circular Countdown Ring */
+    .timer-container {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .progress-ring {
+      transform: rotate(-90deg);
+      width: 36px;
+      height: 36px;
+      will-change: transform;
+    }
+
+    .progress-ring-bg {
+      stroke: var(--ring-bg);
+    }
+
+    .progress-ring-fg {
+      stroke-dasharray: 88;
+      stroke-dashoffset: 0;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1.05s linear, stroke 0.3s ease;
+      will-change: stroke-dashoffset, stroke;
+    }
+
+    .progress-timer-text {
+      position: absolute;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* Empty State View */
+    .empty-state {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 48px 24px;
+      text-align: center;
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      box-shadow: 0 8px 32px var(--color-shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .empty-footer-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      box-shadow: 0 8px 32px var(--color-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .empty-illustration {
+      width: 80px;
+      height: 80px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-primary);
+      margin-bottom: 8px;
+      box-shadow: inset 0 0 16px rgba(99, 102, 241, 0.05);
+    }
+
+    .empty-illustration svg {
+      width: 36px;
+      height: 36px;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .empty-state h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .empty-state p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      max-width: 320px;
+      line-height: 1.5;
+    }
+
+    .empty-state-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 320px;
+      margin-top: 10px;
+    }
+    
+    .empty-state-buttons button {
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* Modal System: Overlay Popup Windows */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(5, 6, 10, 0.7);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s linear, visibility 0.15s linear;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-window {
+      width: 100%;
+      max-width: 480px;
+      background: linear-gradient(145deg, #12131a, #090a0f);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(99, 102, 241, 0.1);
+      transform: scale(0.95) translateY(10px);
+      opacity: 0;
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+      will-change: transform, opacity;
+    }
+
+    [data-theme="light"] .modal-window {
+      background: linear-gradient(145deg, #ffffff, #f1f5f9);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12), 0 0 30px rgba(99, 102, 241, 0.04);
+    }
+
+    .modal-backdrop.active .modal-window {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+
+    .modal-header {
+      padding: 20px 24px 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .modal-header h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .modal-body {
+      padding: 0 24px 24px 24px;
+      overflow-y: auto;
+      max-height: calc(90vh - 100px);
+    }
+
+    .modal-footer-info {
+      padding: 16px 24px;
+      background: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid var(--card-border);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    [data-theme="light"] .modal-footer-info {
+      background: rgba(15, 23, 42, 0.02);
+    }
+
+    @media (max-width: 600px) {
+      .modal-backdrop {
+        align-items: flex-end;
+        padding: 0;
+      }
+
+      .modal-window {
+        max-width: 100%;
+        border-radius: 28px 28px 0 0;
+        transform: translateY(100%);
+        transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease;
+        max-height: 85vh;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+      }
+
+      .modal-backdrop.active .modal-window {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    /* Modal Navigation Tabs */
+    .tab-bar {
+      display: flex;
+      background: var(--btn-bg);
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      height: 36px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--card-bg);
+      color: var(--text-primary);
+      box-shadow: 0 2px 8px var(--color-shadow);
+    }
+
+    .tab-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Form Fields */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .form-control {
+      width: 100%;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      background: var(--btn-bg);
+      color: var(--text-primary);
+      padding: 0 16px;
+      font-family: var(--font-main);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      background: rgba(99, 102, 241, 0.03);
+    }
+    
+    select.form-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+
+    /* Advanced Config (Accordion) */
+    .accordion-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 8px 0;
+      user-select: none;
+      transition: color 0.2s ease;
+    }
+
+    .accordion-header:hover {
+      color: var(--text-secondary);
+    }
+
+    .accordion-header svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.25s ease;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .accordion-header.active svg {
+      transform: rotate(180deg);
+    }
+
+    .accordion-body {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      padding-top: 8px;
+    }
+
+    .accordion-body.active {
+      display: flex;
+    }
+
+    /* Drag & Drop File Zone */
+    .drag-drop-zone {
+      border: 2px dashed var(--card-border);
+      border-radius: 16px;
+      padding: 32px 16px;
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      background: var(--btn-bg);
+      transition: all 0.25s ease;
+    }
+
+    .drag-drop-zone.dragover {
+      border-color: var(--accent-primary);
+      background: rgba(99, 102, 241, 0.05);
+      box-shadow: inset 0 0 12px rgba(99, 102, 241, 0.1);
+    }
+
+    .drag-drop-zone svg {
+      width: 40px;
+      height: 40px;
+      color: var(--text-muted);
+      stroke: currentColor;
+      stroke-width: 1.5;
+    }
+
+    .drag-drop-zone p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .drag-drop-zone span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Webcam Container */
+    .webcam-container {
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000000;
+      position: relative;
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--card-border);
+    }
+
+    #webcam-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .placeholder-msg {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .error-msg {
+      color: var(--color-danger);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .status-msg {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 8px 12px;
+      border-radius: 8px;
+      text-align: center;
+      display: none;
+    }
+
+    .status-msg.loading {
+      display: block;
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--accent-primary);
+    }
+
+    .status-msg.success {
+      display: block;
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--color-success);
+    }
+
+    .status-msg.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--color-danger);
+    }
+
+    .modal-footer {
+      padding: 20px 24px;
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      font-size: 0.85rem;
+      font-weight: 600;
+      pointer-events: none;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .toast-container.active {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast-icon {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toast-icon svg {
+      width: 100%;
+      height: 100%;
+      stroke-width: 2.5;
+    }
+
+    .toast-success .toast-icon { color: var(--color-success); }
+    .toast-error .toast-icon { color: var(--color-danger); }
+    .toast-info .toast-icon { color: var(--accent-cyan); }
+
+    /* Footer Info */
+    footer {
+      text-align: center;
+      padding: 32px 0;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+
+    footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    footer a:hover {
+      color: var(--accent-primary);
+    }
+
+    /* Animations */
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="auth-card">
-        <h1 class="auth-title">Fast Authenticator</h1>
-        <div id="error-msg" class="auth-error">Invalid Secret Key Format.</div>
+  <div class="app-container">
+    
+    <!-- Secure Context Warning (Web Crypto Check) -->
+    <div id="crypto-warning" style="display: none; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 20px; padding: 16px 20px; font-size: 0.85rem; line-height: 1.5; color: var(--text-secondary); margin-bottom: 4px; box-shadow: 0 4px 16px var(--color-shadow);">
+      <div style="font-weight: 700; color: var(--color-warning); display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 18px; height: 18px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <span>JS Cryptographic Engine Active (Insecure Context)</span>
+      </div>
+      This browser context does not support the native Web Crypto API. Fast Authenticator has automatically activated a secure, client-side JS fallback engine to generate your codes. For maximum security, we recommend loading this app over <a href="https://2fa.fast" target="_blank" style="color: var(--accent-cyan); font-weight: 700; text-decoration: underline;">https://2fa.fast</a> or running it on a secure local context (localhost).
+    </div>
 
-        <div id="view-code">
-            <div class="auth-code" id="code-display" title="Click to copy">------</div>
-            <div class="auth-code-next" id="code-next-display">------</div>
-            
-            <div class="timer-container">
-                <div class="progress-bg"><div class="progress-bar" id="progress-bar"></div></div>
-                <div class="time-text"><span id="time-left">30</span>s</div>
-            </div>
+    <!-- Header -->
+    <header>
+      <a href="#" class="brand">
+        <div class="brand-logo">
+          <!-- Lock Icon -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h1>Fast Authenticator</h1>
+          <span>100% Client-Side 2FA</span>
+        </div>
+      </a>
+      
+      <div class="header-actions">
+        <!-- PWA Install Button (hidden by default) -->
+        <button class="btn-icon" id="pwa-install-btn" style="display: none;" onclick="installPWA()" title="Install as App">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        </button>
+        <!-- Light/Dark Toggle -->
+        <button class="btn-icon" onclick="toggleTheme()" id="theme-toggle-btn" title="Toggle Theme">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <!-- Backup & Settings -->
+        <button class="btn-icon" onclick="openModal('settings-modal')" title="Backup & Restore">
+          <svg viewBox="0 0 24 24">
+            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+            <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path>
+          </svg>
+        </button>
+        <!-- Add Account -->
+        <button class="btn-primary" onclick="openModal('add-modal')">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>Add</span>
+        </button>
+      </div>
+    </header>
 
-            <div class="secret-info" id="secret-display"></div>
-            <a href="?" class="reset-link">Enter a different key</a>
+
+
+    <!-- Active URL-loaded Temporary Account -->
+    <div id="url-account-section" style="display: none;">
+      <div class="temp-banner">
+        <div class="temp-banner-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <span>Active Code via Secret Link</span>
+        </div>
+        
+        <!-- Live Card Rendered Dynamically -->
+        <div id="temp-card-container"></div>
+        
+        <div class="temp-actions">
+          <button class="btn-primary" onclick="saveTempAccount()">Save to this Device</button>
+          <button class="btn-secondary" onclick="dismissTempAccount()">Dismiss</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search / Filter bar (Shown if accounts saved) -->
+    <div class="search-panel" id="search-panel" style="display: none;">
+      <span class="search-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </span>
+      <input type="text" id="search-bar" class="search-input" placeholder="Search accounts..." oninput="filterAccounts()">
+      <span class="badge-count" id="accounts-badge">0</span>
+    </div>
+    <!-- Active Accounts List -->
+    <div class="accounts-grid" id="accounts-grid"></div>
+
+    <!-- Empty State View -->
+    <div class="empty-state" id="empty-state">
+      <div class="empty-illustration" id="empty-illustration">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      </div>
+      <h2 id="empty-title">No Saved Accounts Found</h2>
+      <p>Paste a secret key to generate a code instantly, or choose a manager option below.</p>
+      
+      <!-- Instant Code Input -->
+      <div style="width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+        <input type="text" id="empty-instant-secret" class="form-control" placeholder="Paste Secret Key (Base32)" style="text-align: center; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">
+        <span id="instant-error" style="color: var(--color-danger); font-size: 0.75rem; font-weight: 600; display: none;">Invalid Base32 secret key</span>
+        <div id="instant-preview-container" style="width: 100%;"></div>
+      </div>
+      <div style="display: flex; align-items: center; width: 100%; max-width: 320px; margin: 10px 0;">
+        <hr style="flex: 1; border: 0; border-top: 1px solid var(--card-border);">
+        <span style="padding: 0 12px; font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">OR</span>
+        <hr style="flex: 1; border: 0; border-top: 1px solid var(--card-border);">
+      </div>
+
+      <div class="empty-state-buttons">
+        <button class="btn-primary" onclick="openModal('add-modal'); switchTab('camera');">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+          Scan QR Code
+        </button>
+        <button class="btn-secondary" onclick="openModal('add-modal'); switchTab('file');">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          Upload QR Image
+        </button>
+        <button class="btn-secondary" onclick="openModal('add-modal'); switchTab('manual');">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+          Enter Key Manually
+        </button>
+        <button class="btn-secondary" onclick="openModal('add-modal'); switchTab('bulk');">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          Add List of Codes
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty State Footer Card -->
+    <div class="empty-footer-card" id="empty-footer-card" style="display: none;">
+      <div style="font-weight: 700; color: var(--accent-cyan); display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 16px; height: 16px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <span>Quick URL Access (GET)</span>
+      </div>
+      <p style="font-size: 0.85rem; line-height: 1.5; color: var(--text-secondary);">
+        You can instantly load, generate, and auto-copy a 2FA code without manual entry. Just append the secret key to the URL as a path or query variable:
+      </p>
+      <code style="display: block; font-family: monospace; font-size: 0.8rem; color: var(--accent-secondary); margin-top: 8px; background: var(--btn-bg); padding: 6px 12px; border-radius: 8px; word-break: break-all; border: 1px solid var(--card-border); font-weight: 600;">https://2fa.fast/?YOUR_SECRET_KEY</code>
+    </div>
+  </div>
+
+  <!-- Add Account Modal Backdrop -->
+  <div class="modal-backdrop" id="add-modal" onclick="if(event.target === this) closeModal('add-modal')">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 style="font-size: 1.15rem; font-weight: 700;">Add 2FA Account</h3>
+        <button class="btn-icon" onclick="closeModal('add-modal')" style="width: 32px; height: 32px; border-radius: 8px;" title="Close">
+          <svg viewBox="0 0 24 24" style="width:16px; height:16px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Tabs -->
+        <div class="tab-bar" style="margin-bottom: 16px;">
+          <button class="tab-btn active" id="tab-camera" onclick="switchTab('camera')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            Webcam
+          </button>
+          <button class="tab-btn" id="tab-file" onclick="switchTab('file')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            Upload
+          </button>
+          <button class="tab-btn" id="tab-manual" onclick="switchTab('manual')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            Manual
+          </button>
+          <button class="tab-btn" id="tab-bulk" onclick="switchTab('bulk')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg>
+            List
+          </button>
         </div>
 
-        <div id="view-input">
-            <form id="secret-form" class="input-group">
-                <input type="text" id="secret-input" class="secret-input" placeholder="Enter your secret key" required autocomplete="off">
-                <button type="submit" class="submit-btn">Generate Code</button>
-            </form>
-        </div>
-    </div>
-
-    <div class="auth-card small-card" id="save-card" style="display: none;">
-        <div class="auth-title" style="font-size: 1rem;">Save to this device</div>
-        <form id="save-form" class="input-group" style="margin-top: 1rem;">
-            <input type="text" id="save-name" class="secret-input" placeholder="Account Name (e.g. Work Email)" required autocomplete="off">
-            <button type="submit" class="submit-btn" style="background-color: var(--success);">Save Account</button>
-        </form>
-        <div id="save-msg" style="color: var(--success); display: none; margin-top: 1rem; font-size: 0.95rem; font-weight: 500;">Account saved successfully!</div>
-    </div>
-
-    <div class="auth-card small-card" id="load-card" style="display: none;">
-        <div class="auth-title" style="font-size: 1rem;">Saved Accounts</div>
-        <div id="saved-accounts-list" class="input-group" style="margin-top: 1rem;">
+        <!-- Camera Scanner Tab -->
+        <div class="tab-content active" id="content-camera">
+          <div class="webcam-container" style="margin-bottom: 16px;">
+            <div id="webcam-preview">
+              <div class="placeholder-msg">Start camera to begin scanning</div>
             </div>
-        <a href="#" id="clear-saved" class="reset-link" style="color: var(--danger); opacity: 0.8; margin-top: 1.5rem;">Clear all saved accounts</a>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-primary" style="flex: 1; justify-content: center;" onclick="startWebcamScanner()">Start Camera</button>
+            <button class="btn-secondary" style="display: none; justify-content: center;" id="stop-webcam-btn" onclick="stopWebcamScanner()">Stop</button>
+          </div>
+        </div>
+
+        <!-- File Upload Tab -->
+        <div class="tab-content" id="content-file">
+          <div class="drag-drop-zone" id="drag-drop-zone" style="margin-bottom: 16px;">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            <p>Drag & drop QR image here, or click to browse</p>
+            <span>Supports PNG, JPG, JPEG</span>
+            <input type="file" id="qr-file-input" style="display: none;" accept="image/*">
+          </div>
+          <div class="status-msg" id="file-upload-status"></div>
+        </div>
+
+        <!-- Manual Form Tab -->
+        <div class="tab-content" id="content-manual">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="form-group">
+              <label for="input-issuer">Issuer / Provider <span style="font-weight: 400; opacity: 0.7;">(Optional)</span></label>
+              <input type="text" id="input-issuer" class="form-control" placeholder="e.g. Google, GitHub, Discord">
+            </div>
+            <div class="form-group">
+              <label for="input-label">Account Label <span style="font-weight: 400; opacity: 0.7;">(Optional)</span></label>
+              <input type="text" id="input-label" class="form-control" placeholder="e.g. user@gmail.com">
+            </div>
+            <div class="form-group">
+              <label for="input-secret">Secret Key (Base32)</label>
+              <input type="text" id="input-secret" class="form-control" placeholder="e.g. JBSWY3DPEHPK3PXP" required style="text-transform: uppercase;">
+            </div>
+
+            <!-- Advanced Config Accordion -->
+            <div class="accordion-header" onclick="toggleAdvancedSettings()" id="advanced-toggle">
+              <span>Advanced Config</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+
+            <div class="accordion-body" id="advanced-body">
+              <div class="form-group">
+                <label for="input-algorithm">Algorithm</label>
+                <select id="input-algorithm" class="form-control">
+                  <option value="SHA-1" selected>SHA-1 (Default)</option>
+                  <option value="SHA-256">SHA-256</option>
+                  <option value="SHA-512">SHA-512</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="input-digits">Digits</label>
+                <select id="input-digits" class="form-control">
+                  <option value="6" selected>6 Digits</option>
+                  <option value="8">8 Digits</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="input-period">Period (Seconds)</label>
+                <input type="number" id="input-period" class="form-control" value="30" min="10" max="300">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bulk Form Tab -->
+        <div class="tab-content" id="content-bulk">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="form-group">
+              <label for="input-bulk">Secret Keys (one per line)</label>
+              <textarea id="input-bulk" class="form-control" style="height: 140px; font-family: monospace; resize: vertical; padding: 12px; line-height: 1.5;" placeholder="JBSWY3DPEHPK3PXP&#10;KVKVE43VONYXE23K&#10;..."></textarea>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-top: -4px;">
+              💡 Paste multiple raw Base32 secret keys. Empty lines are skipped automatically.
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button class="btn-secondary" onclick="closeModal('add-modal')">Cancel</button>
+          <button class="btn-primary" id="add-modal-save-btn" onclick="saveManualAccount()">Save Account</button>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // 1. Base32 Decoder
-        function base32decode(base32) {
-            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-            base32 = base32.replace(/[^A-Z2-7]/gi, '').toUpperCase();
-            if (base32.length === 0) return null;
-            const bytes = new Uint8Array(Math.floor((base32.length * 5) / 8));
-            let bits = 0, value = 0, index = 0;
-            for (let i = 0; i < base32.length; i++) {
-                value = (value << 5) | alphabet.indexOf(base32[i]);
-                bits += 5;
-                if (bits >= 8) {
-                    bytes[index++] = (value >>> (bits - 8)) & 255;
-                    bits -= 8;
-                }
-            }
-            return bytes;
+  <!-- Settings & Backup Modal Backdrop -->
+  <div class="modal-backdrop" id="settings-modal" onclick="if(event.target === this) closeModal('settings-modal')">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 style="font-size: 1.15rem; font-weight: 700;">Backup & Settings</h3>
+        <button class="btn-icon" onclick="closeModal('settings-modal')" style="width: 32px; height: 32px; border-radius: 8px;" title="Close">
+          <svg viewBox="0 0 24 24" style="width:16px; height:16px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="form-group">
+          <label>Data Portability</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px;">
+            <button class="btn-secondary" onclick="exportBackup()" style="justify-content: center;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Export JSON
+            </button>
+            <button class="btn-secondary" onclick="document.getElementById('import-file-input').click()" style="justify-content: center;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              Import Backup
+            </button>
+            <input type="file" id="import-file-input" style="display: none;" accept=".json" onchange="importBackup(event)">
+          </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--card-border);">
+
+        <div class="form-group">
+          <label style="color: var(--color-danger)">Danger Zone</label>
+          <button class="btn-secondary" onclick="clearAllData()" style="justify-content: center; color: var(--color-danger); border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); margin-top: 6px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            Clear All Device Data
+          </button>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--card-border);">
+
+        <div class="form-group">
+          <label>Security & Privacy Guarantees</label>
+          <div style="font-size: 0.8rem; line-height: 1.5; color: var(--text-secondary); display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+            <p>🛡️ <strong>100% Local Engine:</strong> Cryptographic signatures are calculated directly inside your browser process using the native Web Crypto API. No data is ever transmitted to an external server.</p>
+            <p>💻 <strong>Host Anywhere:</strong> Fast Authenticator is client-only. You can download this single file and run it offline on your desktop by just opening it directly.</p>
+            <p>⚠️ <strong>Local Storage warning:</strong> Keys are stored unencrypted in browser localStorage. Ensure your device is password protected and do not save accounts on shared public profiles.</p>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+          <button class="btn-primary" onclick="closeModal('settings-modal')">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Account Modal Backdrop -->
+  <div class="modal-backdrop" id="edit-modal" onclick="if(event.target === this) closeModal('edit-modal')">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 style="font-size: 1.15rem; font-weight: 700;">Edit 2FA Account</h3>
+        <button class="btn-icon" onclick="closeModal('edit-modal')" style="width: 32px; height: 32px; border-radius: 8px;" title="Close">
+          <svg viewBox="0 0 24 24" style="width:16px; height:16px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-account-id">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="form-group">
+            <label for="edit-issuer">Issuer / Provider <span style="font-weight: 400; opacity: 0.7;">(Optional)</span></label>
+            <input type="text" id="edit-issuer" class="form-control" placeholder="e.g. Google, GitHub, Discord">
+          </div>
+          <div class="form-group">
+            <label for="edit-label">Account Label <span style="font-weight: 400; opacity: 0.7;">(Optional)</span></label>
+            <input type="text" id="edit-label" class="form-control" placeholder="e.g. user@gmail.com">
+          </div>
+          <div class="form-group">
+            <label for="edit-secret">Secret Key (Base32)</label>
+            <input type="text" id="edit-secret" class="form-control" placeholder="e.g. JBSWY3DPEHPK3PXP" required style="text-transform: uppercase;">
+          </div>
+
+          <!-- Edit Advanced Config Accordion -->
+          <div class="accordion-header" onclick="toggleEditAdvancedSettings()" id="edit-advanced-toggle">
+            <span>Advanced Config</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+
+          <div class="accordion-body" id="edit-advanced-body">
+            <div class="form-group">
+              <label for="edit-algorithm">Algorithm</label>
+              <select id="edit-algorithm" class="form-control">
+                <option value="SHA-1">SHA-1 (Default)</option>
+                <option value="SHA-256">SHA-256</option>
+                <option value="SHA-512">SHA-512</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit-digits">Digits</label>
+              <select id="edit-digits" class="form-control">
+                <option value="6">6 Digits</option>
+                <option value="8">8 Digits</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit-period">Period (Seconds)</label>
+              <input type="number" id="edit-period" class="form-control" min="10" max="300">
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button class="btn-secondary" onclick="closeModal('edit-modal')">Cancel</button>
+          <button class="btn-primary" onclick="updateSavedAccount()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Confirm Modal Backdrop -->
+  <div class="modal-backdrop" id="confirm-modal" onclick="if(event.target === this) closeModal('confirm-modal')">
+    <div class="modal-window" style="max-width: 400px;">
+      <div class="modal-header" style="border: 0; padding: 20px 24px 8px 24px;">
+        <h3 id="confirm-title" style="font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+          Confirm Action
+        </h3>
+      </div>
+      <div class="modal-body" style="padding: 0 24px 20px 24px;">
+        <p id="confirm-msg" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;"></p>
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+          <button class="btn-secondary" id="confirm-cancel" style="flex: 1; justify-content: center; height: 40px;">Cancel</button>
+          <button class="btn-primary" id="confirm-ok" style="flex: 1; justify-content: center; height: 40px; background: var(--color-danger); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Overlay -->
+  <div class="toast-container" id="toast">
+    <div class="toast-icon" id="toast-icon"></div>
+    <span id="toast-msg">Success Message</span>
+  </div>
+
+  <!-- Hidden Div for QR Image Parsing -->
+  <div id="hidden-qr-reader" style="display: none;"></div>
+
+  <!-- Footer -->
+  <footer>
+    <p>Fast Authenticator v2.3.0</p>
+    <p><a href="https://2fa.fast" target="_blank">2fa.fast</a> &bull; Coded by Yurii</p>
+  </footer>
+
+  <!-- Core JavaScript -->
+  <script>
+    // Embedded SVG Icon Constants
+    const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1" /><stop offset="100%" stop-color="#06b6d4" /></linearGradient></defs><rect width="512" height="512" rx="128" fill="#08090c" /><g transform="translate(128, 128)"><rect x="32" y="96" width="192" height="128" rx="24" fill="url(#g)" /><path d="M64 96V72a64 64 0 0 1 128 0v24" stroke="url(#g)" stroke-width="24" fill="none" /><circle cx="128" cy="150" r="16" fill="#08090c" /><path d="M128 166v24" stroke="#08090c" stroke-width="12" stroke-linecap="round" /></g></svg>`;
+
+    // Programmatically link PWA Meta & Icons
+    const faviconLink = document.createElement('link');
+    faviconLink.rel = 'icon';
+    faviconLink.type = 'image/svg+xml';
+    faviconLink.href = `data:image/svg+xml;utf8,${encodeURIComponent(iconSvg)}`;
+    document.head.appendChild(faviconLink);
+
+    const appleIconLink = document.createElement('link');
+    appleIconLink.rel = 'apple-touch-icon';
+    appleIconLink.href = `data:image/svg+xml;utf8,${encodeURIComponent(iconSvg)}`;
+    document.head.appendChild(appleIconLink);
+
+    // State Variables
+    let accounts = [];
+    let tempAccount = null;
+    let html5QrcodeScanner = null;
+    const cachedCodes = {};
+    const cardStates = {};
+
+    // 1. Theme Configuration
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('fast2fa_theme', theme);
+      
+      const themeBtn = document.getElementById('theme-toggle-btn');
+      if (theme === 'light') {
+        themeBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`; // Moon icon
+      } else {
+        themeBtn.innerHTML = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`; // Sun icon
+      }
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    }
+
+    // Initialize Theme
+    const savedTheme = localStorage.getItem('fast2fa_theme');
+    if (savedTheme) {
+      setTheme(savedTheme);
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(prefersDark ? 'dark' : 'light');
+    }
+
+    // 2. Base32 Cryptographic Decoder
+    function base32ToBytes(base32) {
+      const base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+      let cleanStr = base32.replace(/=+$/, "")
+                           .replace(/\s/g, "")
+                           .toUpperCase()
+                           .replace(/0/g, "O")
+                           .replace(/1/g, "I")
+                           .replace(/8/g, "B");
+      if (!cleanStr) return new Uint8Array(0);
+      
+      let bits = "";
+      for (let i = 0; i < cleanStr.length; i++) {
+        const val = base32chars.indexOf(cleanStr.charAt(i));
+        if (val === -1) {
+          throw new Error(`Invalid base32 char`);
         }
+        bits += val.toString(2).padStart(5, '0');
+      }
+      
+      const bytes = new Uint8Array(Math.floor(bits.length / 8));
+      for (let i = 0; i < bytes.length; i++) {
+        bytes[i] = parseInt(bits.substring(i * 8, (i + 1) * 8), 2);
+      }
+      return bytes;
+    }
 
-        // 2. Web Crypto TOTP Generator
-        async function generateTOTP(secret, offset = 0) {
-            const keyBytes = base32decode(secret);
-            if (!keyBytes) return null;
+    // 3. Web Crypto key caching engine (bypasses redundant Base32 decodes and importKey operations)
+    const keyCache = {};
 
-            const timeStep = Math.floor(Date.now() / 1000 / 30) + offset;
-            const timeBytes = new ArrayBuffer(8);
-            new DataView(timeBytes).setUint32(4, timeStep, false);
+    async function getCryptoKey(secret, algorithm) {
+      const cacheKey = `${secret}-${algorithm}`;
+      if (keyCache[cacheKey]) return keyCache[cacheKey];
+      
+      const secretBytes = base32ToBytes(secret);
+      const cryptoAlg = {
+        name: "HMAC",
+        hash: { name: algorithm }
+      };
+      
+      if (!window.crypto || !window.crypto.subtle) {
+        throw new Error('Web Crypto API missing');
+      }
 
-            const cryptoKey = await crypto.subtle.importKey('raw', keyBytes, { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']);
-            const signature = await crypto.subtle.sign('HMAC', cryptoKey, timeBytes);
-            const hmac = new Uint8Array(signature);
+      const key = await window.crypto.subtle.importKey(
+        "raw",
+        secretBytes,
+        cryptoAlg,
+        false,
+        ["sign"]
+      );
+      keyCache[cacheKey] = key;
+      return key;
+    }
 
-            const offsetByte = hmac[hmac.length - 1] & 0xf;
-            const binary = ((hmac[offsetByte] & 0x7f) << 24) | ((hmac[offsetByte + 1] & 0xff) << 16) | ((hmac[offsetByte + 2] & 0xff) << 8) | (hmac[offsetByte + 3] & 0xff);
-            
-            return (binary % 1000000).toString().padStart(6, '0');
+    // --- Pure JavaScript Cryptographic Fallbacks ---
+    function jsSHA1(message) {
+      const len = message.length;
+      const bitLen = len * 8;
+      const paddedLen = ((len + 9 + 63) >>> 6) << 6;
+      const words = new Uint32Array(paddedLen >> 2);
+      
+      for (let i = 0; i < len; i++) {
+        words[i >> 2] |= message[i] << (24 - (i % 4) * 8);
+      }
+      words[len >> 2] |= 0x80 << (24 - (len % 4) * 8);
+      words[words.length - 1] = bitLen;
+      
+      let h0 = 0x67452301;
+      let h1 = 0xEFCDAB89;
+      let h2 = 0x98BADCFE;
+      let h3 = 0x10325476;
+      let h4 = 0xC3D2E1F0;
+      
+      const w = new Uint32Array(80);
+      
+      for (let i = 0; i < words.length; i += 16) {
+        for (let j = 0; j < 16; j++) {
+          w[j] = words[i + j];
         }
+        for (let j = 16; j < 80; j++) {
+          const val = w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16];
+          w[j] = (val << 1) | (val >>> 31);
+        }
+        
+        let a = h0;
+        let b = h1;
+        let c = h2;
+        let d = h3;
+        let e = h4;
+        
+        for (let j = 0; j < 80; j++) {
+          let f, kVal;
+          if (j < 20) {
+            f = (b & c) | (~b & d);
+            kVal = 0x5a827999;
+          } else if (j < 40) {
+            f = b ^ c ^ d;
+            kVal = 0x6ed9eba1;
+          } else if (j < 60) {
+            f = (b & c) | (b & d) | (c & d);
+            kVal = 0x8f1bbcdc;
+          } else {
+            f = b ^ c ^ d;
+            kVal = 0xca62c1d6;
+          }
+          
+          const temp = (((a << 5) | (a >>> 27)) + f + e + kVal + w[j]) | 0;
+          e = d;
+          d = c;
+          c = (b << 30) | (b >>> 2);
+          b = a;
+          a = temp;
+        }
+        
+        h0 = (h0 + a) | 0;
+        h1 = (h1 + b) | 0;
+        h2 = (h2 + c) | 0;
+        h3 = (h3 + d) | 0;
+        h4 = (h4 + e) | 0;
+      }
+      
+      const result = new Uint8Array(20);
+      const view = new DataView(result.buffer);
+      view.setUint32(0, h0);
+      view.setUint32(4, h1);
+      view.setUint32(8, h2);
+      view.setUint32(12, h3);
+      view.setUint32(16, h4);
+      return result;
+    }
 
-        // 3. UI and Logic Controller
-        const secretKey = decodeURIComponent(window.location.search.substring(1).trim());
-        let rawCurrentCode = "";
+    function jsSHA256(message) {
+      const len = message.length;
+      const bitLen = len * 8;
+      const paddedLen = ((len + 9 + 63) >>> 6) << 6;
+      const words = new Uint32Array(paddedLen >> 2);
+      
+      for (let i = 0; i < len; i++) {
+        words[i >> 2] |= message[i] << (24 - (i % 4) * 8);
+      }
+      words[len >> 2] |= 0x80 << (24 - (len % 4) * 8);
+      words[words.length - 1] = bitLen;
+      
+      let h0 = 0x6a09e667;
+      let h1 = 0xbb67ae85;
+      let h2 = 0x3c6ef372;
+      let h3 = 0xa54ff53a;
+      let h4 = 0x510e527f;
+      let h5 = 0x9b05688c;
+      let h6 = 0x1f83d9ab;
+      let h7 = 0x5be0cd19;
+      
+      const kVal = new Uint32Array([
+        0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+        0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+        0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+        0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+        0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+        0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+        0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+        0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+      ]);
+      
+      const w = new Uint32Array(64);
+      
+      for (let i = 0; i < words.length; i += 16) {
+        for (let j = 0; j < 16; j++) {
+          w[j] = words[i + j];
+        }
+        for (let j = 16; j < 64; j++) {
+          const s0 = ((w[j - 15] >>> 7) | (w[j - 15] << 25)) ^
+                     ((w[j - 15] >>> 18) | (w[j - 15] << 14)) ^
+                      (w[j - 15] >>> 3);
+          const s1 = ((w[j - 2] >>> 17) | (w[j - 2] << 15)) ^
+                     ((w[j - 2] >>> 19) | (w[j - 2] << 13)) ^
+                      (w[j - 2] >>> 10);
+          w[j] = (w[j - 16] + s0 + w[j - 7] + s1) | 0;
+        }
+        
+        let a = h0;
+        let b = h1;
+        let c = h2;
+        let d = h3;
+        let e = h4;
+        let f = h5;
+        let g = h6;
+        let h = h7;
+        
+        for (let j = 0; j < 64; j++) {
+          const S1 = ((e >>> 6) | (e << 26)) ^
+                     ((e >>> 11) | (e << 21)) ^
+                     ((e >>> 25) | (e << 7));
+          const ch = (e & f) ^ (~e & g);
+          const temp1 = (h + S1 + ch + kVal[j] + w[j]) | 0;
+          const S0 = ((a >>> 2) | (a << 30)) ^
+                     ((a >>> 13) | (a << 19)) ^
+                     ((a >>> 22) | (a << 10));
+          const maj = (a & b) ^ (a & c) ^ (b & c);
+          const temp2 = (S0 + maj) | 0;
+          
+          h = g;
+          g = f;
+          f = e;
+          e = (d + temp1) | 0;
+          d = c;
+          c = b;
+          b = a;
+          a = (temp1 + temp2) | 0;
+        }
+        
+        h0 = (h0 + a) | 0;
+        h1 = (h1 + b) | 0;
+        h2 = (h2 + c) | 0;
+        h3 = (h3 + d) | 0;
+        h4 = (h4 + e) | 0;
+        h5 = (h5 + f) | 0;
+        h6 = (h6 + g) | 0;
+        h7 = (h7 + h) | 0;
+      }
+      
+      const result = new Uint8Array(32);
+      const view = new DataView(result.buffer);
+      view.setUint32(0, h0);
+      view.setUint32(4, h1);
+      view.setUint32(8, h2);
+      view.setUint32(12, h3);
+      view.setUint32(16, h4);
+      view.setUint32(20, h5);
+      view.setUint32(24, h6);
+      view.setUint32(28, h7);
+      return result;
+    }
 
-        if (secretKey) {
-            // STATE: Viewing a code
-            document.getElementById('view-code').style.display = 'block';
-            document.getElementById('secret-display').innerText = `Secret: ${secretKey}`;
-            document.getElementById('save-card').style.display = 'block';
+    function jsSHA512(message) {
+      const len = message.length;
+      const bitLen = BigInt(len) * 8n;
+      const paddedLen = ((len + 17 + 127) >>> 7) << 7;
+      const words = new BigUint64Array(paddedLen >> 3);
+      
+      for (let i = 0; i < len; i++) {
+        const wordIdx = i >> 3;
+        const byteShift = BigInt(56 - (i % 8) * 8);
+        words[wordIdx] |= BigInt(message[i]) << byteShift;
+      }
+      
+      const padWordIdx = len >> 3;
+      const padByteShift = BigInt(56 - (len % 8) * 8);
+      words[padWordIdx] |= 0x80n << padByteShift;
+      words[words.length - 1] = bitLen;
+      
+      let h0 = 0x6a09e667f3bcc908n;
+      let h1 = 0xbb67ae8584caa73bn;
+      let h2 = 0x3c6ef372fe94f82bn;
+      let h3 = 0xa54ff53a5f1d36f1n;
+      let h4 = 0x510e527fade682d1n;
+      let h5 = 0x9b05688c2b3e6c1fn;
+      let h6 = 0x1f83d9abfb41bd6bn;
+      let h7 = 0x5be0cd19137e2179n;
+      
+      const kVal = new BigUint64Array([
+        0x428a2f98d728ae22n, 0x7137449123ef65cdn, 0xb5c0fbcfec4d3b2fn, 0xe9b5dba58189dbbcn, 0x3956c25bf348b538n, 0x59f111f1b605d019n, 0x923f82a4af194f9bn, 0xab1c5ed5da6d8118n,
+        0xd807aa98a3030242n, 0x12835b0145706fben, 0x243185be4ee4b28cn, 0x550c7dc3d5ffb4e2n, 0x72be5d74f27b896fn, 0x80deb1fe3b1696b1n, 0x9bdc06a725c71235n, 0xc19bf174cf692694n,
+        0xe49b69c19ef14ad2n, 0xefbe4786384f25e3n, 0xfc19dc68b8cd5b5n, 0x240ca1cc77ac9c65n, 0x2de92c6f592b0275n, 0x4a7484aa6ea6e483n, 0x5cb0a9dcbd41fbd4n, 0x76f988da831153b5n,
+        0x983e5152ee66dfabn, 0xa831c66d2db43210n, 0xb00327c898fb213fn, 0xbf597fc7beef0ee4n, 0xc6e00bf33da88fc2n, 0xd5a79147930aa725n, 0x6ca6351e003826fn, 0x142929670a0e6e70n,
+        0x27b70a8546d22ffcn, 0x2e1b21385c26c926n, 0x4d2c6dfc5ac42aedn, 0x53380d139d95b3dfn, 0x650a73548baf63den, 0x766a0abb3c77b2a8n, 0x81c2c92e47edaee6n, 0x92722c851482353bn,
+        0xa2bfe8a14cf10364n, 0xa81a664bbc423001n, 0xc24b8b70d0f89791n, 0xc76c51a30654be30n, 0xd192e819d6ef5218n, 0xd69906245565a910n, 0xf40e35855771202an, 0x106aa07032bbd1b8n,
+        0x19a4c116b8d2d0c8n, 0x1e376c085141ab53n, 0x2748774cdf8eeb99n, 0x34b0bcb5e19b48a8n, 0x391c0cb3c5c95a63n, 0x4ed8aa4ae3418acbn, 0x5b9cca4f7763e373n, 0x682e6ff3d6b2b8a3n,
+        0x748f82ee5defb2fcn, 0x78a5636f43172f60n, 0x84c87814a1f0ab72n, 0x8cc702081a6439ecn, 0x90befffa23631e28n, 0xa4506cebde82bde9n, 0xbef9a3f7b2c67915n, 0xc67178f2e372532bn,
+        0xca273eceea26619cn, 0xd186b8c721c0c207n, 0xeada7dd6cde0eb1en, 0xf57d4f7fee6ed178n, 0x6f067aa72176fban, 0xa637dc5a2c898a6n, 0x113f9804bef90daen, 0x1b710b35131c471bn,
+        0x28db77f523047d84n, 0x32caab7b40c72493n, 0x3c9ebe0a15c9bebcn, 0x431d67c49c100d4cn, 0x4cc5d4becb3e42b6n, 0x597f299cfc657e2an, 0x5fcb6fab3ad6faecn, 0x6c44198c4a475817n,
+      ]);
+      
+      const w = new BigUint64Array(80);
+      const mask = 0xffffffffffffffffn;
+      
+      const rotr = (val, bits) => {
+        return ((val >> bits) | (val << (64n - bits))) & mask;
+      };
+      
+      for (let i = 0; i < words.length; i += 16) {
+        for (let j = 0; j < 16; j++) {
+          w[j] = words[i + j];
+        }
+        for (let j = 16; j < 80; j++) {
+          const s0 = rotr(w[j - 15], 1n) ^ rotr(w[j - 15], 8n) ^ (w[j - 15] >> 7n);
+          const s1 = rotr(w[j - 2], 19n) ^ rotr(w[j - 2], 61n) ^ (w[j - 2] >> 6n);
+          w[j] = (w[j - 16] + s0 + w[j - 7] + s1) & mask;
+        }
+        
+        let a = h0;
+        let b = h1;
+        let c = h2;
+        let d = h3;
+        let e = h4;
+        let f = h5;
+        let g = h6;
+        let h = h7;
+        
+        for (let j = 0; j < 80; j++) {
+          const S1 = rotr(e, 14n) ^ rotr(e, 18n) ^ rotr(e, 41n);
+          const ch = (e & f) ^ (~e & g);
+          const temp1 = (h + S1 + ch + kVal[j] + w[j]) & mask;
+          const S0 = rotr(a, 28n) ^ rotr(a, 34n) ^ rotr(a, 39n);
+          const maj = (a & b) ^ (a & c) ^ (b & c);
+          const temp2 = (S0 + maj) & mask;
+          
+          h = g;
+          g = f;
+          f = e;
+          e = (d + temp1) & mask;
+          d = c;
+          c = b;
+          b = a;
+          a = (temp1 + temp2) & mask;
+        }
+        
+        h0 = (h0 + a) & mask;
+        h1 = (h1 + b) & mask;
+        h2 = (h2 + c) & mask;
+        h3 = (h3 + d) & mask;
+        h4 = (h4 + e) & mask;
+        h5 = (h5 + f) & mask;
+        h6 = (h6 + g) & mask;
+        h7 = (h7 + h) & mask;
+      }
+      
+      const result = new Uint8Array(64);
+      const view = new DataView(result.buffer);
+      
+      const writeBigUint64 = (dataView, byteOffset, value) => {
+        const high = Number(value >> 32n);
+        const low = Number(value & 0xffffffffn);
+        dataView.setUint32(byteOffset, high);
+        dataView.setUint32(byteOffset + 4, low);
+      };
+      
+      writeBigUint64(view, 0, h0);
+      writeBigUint64(view, 8, h1);
+      writeBigUint64(view, 16, h2);
+      writeBigUint64(view, 24, h3);
+      writeBigUint64(view, 32, h4);
+      writeBigUint64(view, 40, h5);
+      writeBigUint64(view, 48, h6);
+      writeBigUint64(view, 56, h7);
+      return result;
+    }
 
-            async function updateCodes() {
-                const current = await generateTOTP(secretKey, 0);
-                const next = await generateTOTP(secretKey, 1);
-                
-                if (!current) {
-                    document.getElementById('view-code').style.display = 'none';
-                    document.getElementById('save-card').style.display = 'none';
-                    document.getElementById('view-input').style.display = 'block';
-                    document.getElementById('error-msg').style.display = 'block';
-                    return;
-                }
+    function jsHMAC(key, message, hashFn, blockSize) {
+      let kVal = new Uint8Array(key);
+      if (kVal.length > blockSize) {
+        kVal = hashFn(kVal);
+      }
+      if (kVal.length < blockSize) {
+        const temp = new Uint8Array(blockSize);
+        temp.set(kVal);
+        kVal = temp;
+      }
+      
+      const ipad = new Uint8Array(blockSize);
+      const opad = new Uint8Array(blockSize);
+      for (let i = 0; i < blockSize; i++) {
+        ipad[i] = kVal[i] ^ 0x36;
+        opad[i] = kVal[i] ^ 0x5c;
+      }
+      
+      const innerMessage = new Uint8Array(blockSize + message.length);
+      innerMessage.set(ipad);
+      innerMessage.set(message, blockSize);
+      const innerHash = hashFn(innerMessage);
+      
+      const outerMessage = new Uint8Array(blockSize + innerHash.length);
+      outerMessage.set(opad);
+      outerMessage.set(innerHash, blockSize);
+      return hashFn(outerMessage);
+    }
 
-                rawCurrentCode = current;
-                document.getElementById('code-display').innerText = current.slice(0, 3) + ' ' + current.slice(3, 6);
-                document.getElementById('code-next-display').innerText = next.slice(0, 3) + ' ' + next.slice(3, 6);
-            }
-
-            function updateTimer() {
-                const now = Math.floor(Date.now() / 1000);
-                const timeLeft = 30 - (now % 30);
-                
-                document.getElementById('time-left').innerText = timeLeft;
-                const progressBar = document.getElementById('progress-bar');
-                progressBar.style.width = (timeLeft / 30 * 100) + '%';
-                
-                timeLeft <= 5 ? progressBar.classList.add('warning') : progressBar.classList.remove('warning');
-                if (timeLeft === 30) updateCodes(); 
-            }
-
-            updateCodes();
-            updateTimer();
-            setInterval(updateTimer, 1000);
-
-            // Click-to-Copy functionality
-            const codeDisplay = document.getElementById('code-display');
-            let copyTimeout;
-            codeDisplay.addEventListener('click', async () => {
-                const originalHTML = codeDisplay.innerHTML;
-                try {
-                    await navigator.clipboard.writeText(rawCurrentCode);
-                    codeDisplay.innerText = 'COPIED!';
-                    codeDisplay.classList.add('copied');
-                    clearTimeout(copyTimeout);
-                    copyTimeout = setTimeout(() => { codeDisplay.innerHTML = originalHTML; codeDisplay.classList.remove('copied'); }, 1500);
-                } catch (err) { alert('Browser blocked clipboard access.'); }
-            });
-
-            // Save Account functionality
-            document.getElementById('save-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const name = document.getElementById('save-name').value.trim();
-                if (name && secretKey) {
-                    let accounts = JSON.parse(localStorage.getItem('fastAuthAccounts') || '[]');
-                    // Prevent duplicates of the same secret
-                    accounts = accounts.filter(a => a.secret !== secretKey);
-                    accounts.push({ name: name, secret: secretKey });
-                    localStorage.setItem('fastAuthAccounts', JSON.stringify(accounts));
-                    
-                    document.getElementById('save-form').style.display = 'none';
-                    document.getElementById('save-msg').style.display = 'block';
-                }
-            });
-
+    function jsGenerateTOTP(secret, options = {}) {
+      const digits = options.digits || 6;
+      const period = options.period || 30;
+      const algorithm = options.algorithm || 'SHA-1';
+      
+      let secretBytes;
+      try {
+        secretBytes = base32ToBytes(secret);
+      } catch (err) {
+        return { error: 'Invalid secret format' };
+      }
+      
+      if (secretBytes.length === 0) return { error: 'Empty secret' };
+      
+      const epoch = options.timestamp || Math.floor(Date.now() / 1000);
+      const counter = Math.floor(epoch / period);
+      const secondsRemaining = period - (epoch % period);
+      
+      const buffer = new ArrayBuffer(8);
+      const view = new DataView(buffer);
+      const high = Math.floor(counter / 0x100000000);
+      const low = counter % 0x100000000;
+      view.setUint32(0, high);
+      view.setUint32(4, low);
+      
+      let hash;
+      try {
+        if (algorithm === 'SHA-1') {
+          hash = jsHMAC(secretBytes, new Uint8Array(buffer), jsSHA1, 64);
+        } else if (algorithm === 'SHA-256') {
+          hash = jsHMAC(secretBytes, new Uint8Array(buffer), jsSHA256, 64);
+        } else if (algorithm === 'SHA-512') {
+          hash = jsHMAC(secretBytes, new Uint8Array(buffer), jsSHA512, 128);
         } else {
-            // STATE: Home Page (No code active)
-            document.getElementById('view-input').style.display = 'block';
-            
-            document.getElementById('secret-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const val = document.getElementById('secret-input').value.trim();
-                if (val) window.location.href = window.location.pathname + '?' + encodeURIComponent(val);
-            });
+          return { error: 'Unsupported algorithm: ' + algorithm };
+        }
+      } catch (err) {
+        console.error("JS HMAC failed", err);
+        return { error: 'HMAC logic failed' };
+      }
+      
+      const offset = hash[hash.length - 1] & 0x0f;
+      const binary = ((hash[offset] & 0x7f) << 24) |
+                     ((hash[offset + 1] & 0xff) << 16) |
+                     ((hash[offset + 2] & 0xff) << 8) |
+                     (hash[offset + 3] & 0xff);
+      
+      const otp = (binary % Math.pow(10, digits)).toString().padStart(digits, "0");
+      return { otp, secondsRemaining };
+    }
 
-            // Load Saved Accounts functionality
-            let accounts = JSON.parse(localStorage.getItem('fastAuthAccounts') || '[]');
+    async function calculateTOTPForCounter(counter, secret, digits, period, algorithm) {
+      const buffer = new ArrayBuffer(8);
+      const view = new DataView(buffer);
+      const high = Math.floor(counter / 0x100000000);
+      const low = counter % 0x100000000;
+      view.setUint32(0, high);
+      view.setUint32(4, low);
+      
+      // Attempt Web Crypto API
+      if (window.crypto && window.crypto.subtle) {
+        try {
+          const key = await getCryptoKey(secret, algorithm);
+          const signature = await window.crypto.subtle.sign(
+            "HMAC",
+            key,
+            buffer
+          );
+          
+          const hash = new Uint8Array(signature);
+          const offset = hash[hash.length - 1] & 0x0f;
+          const binary = ((hash[offset] & 0x7f) << 24) |
+                         ((hash[offset + 1] & 0xff) << 16) |
+                         ((hash[offset + 2] & 0xff) << 8) |
+                         (hash[offset + 3] & 0xff);
+          
+          const otp = (binary % Math.pow(10, digits)).toString().padStart(digits, "0");
+          return { otp };
+        } catch (webCryptoErr) {
+          // ignore and fall through to JS fallback
+        }
+      }
+      
+      // JS Fallback
+      try {
+        const secretBytes = base32ToBytes(secret);
+        if (secretBytes.length === 0) return { otp: '------' };
+        
+        let hash;
+        if (algorithm === 'SHA-1') {
+          hash = jsHMAC(secretBytes, new Uint8Array(buffer), jsSHA1, 64);
+        } else if (algorithm === 'SHA-256') {
+          hash = jsHMAC(secretBytes, new Uint8Array(buffer), jsSHA256, 64);
+        } else if (algorithm === 'SHA-512') {
+          hash = jsHMAC(secretBytes, new Uint8Array(buffer), jsSHA512, 128);
+        } else {
+          return { otp: '------' };
+        }
+        
+        const offset = hash[hash.length - 1] & 0x0f;
+        const binary = ((hash[offset] & 0x7f) << 24) |
+                       ((hash[offset + 1] & 0xff) << 16) |
+                       ((hash[offset + 2] & 0xff) << 8) |
+                       (hash[offset + 3] & 0xff);
+        
+        const otp = (binary % Math.pow(10, digits)).toString().padStart(digits, "0");
+        return { otp };
+      } catch (err) {
+        return { otp: '------' };
+      }
+    }
+
+    async function generateTOTP(secret, options = {}) {
+      const digits = options.digits || 6;
+      const period = options.period || 30;
+      const algorithm = options.algorithm || 'SHA-1';
+      
+      const epoch = options.timestamp || Math.floor(Date.now() / 1000);
+      const counter = Math.floor(epoch / period);
+      const secondsRemaining = period - (epoch % period);
+      
+      try {
+        const curRes = await calculateTOTPForCounter(counter, secret, digits, period, algorithm);
+        const nextRes = await calculateTOTPForCounter(counter + 1, secret, digits, period, algorithm);
+        return { otp: curRes.otp, nextOtp: nextRes.otp, secondsRemaining };
+      } catch (err) {
+        console.error(err);
+        return { error: 'Crypto failed' };
+      }
+    }
+
+    // 4. Cached TOTP Code getter (improves power usage)
+    async function getAccountOTP(account) {
+      const epoch = Math.floor(Date.now() / 1000);
+      const period = account.period || 30;
+      const counter = Math.floor(epoch / period);
+      const secondsRemaining = period - (epoch % period);
+      
+      const cacheKey = `${account.id}-${counter}`;
+      if (cachedCodes[cacheKey]) {
+        return { 
+          otp: cachedCodes[cacheKey].otp, 
+          nextOtp: cachedCodes[cacheKey].nextOtp, 
+          secondsRemaining 
+        };
+      }
+      
+      const res = await generateTOTP(account.secret, {
+        algorithm: account.algorithm,
+        digits: account.digits,
+        period: period
+      });
+      
+      if (res.otp && !res.error) {
+        cachedCodes[cacheKey] = { otp: res.otp, nextOtp: res.nextOtp };
+        // Clean cache entries for this account
+        for (const key in cachedCodes) {
+          if (key.startsWith(account.id) && key !== cacheKey) {
+            delete cachedCodes[key];
+          }
+        }
+      }
+      return { 
+        otp: res.otp || '------', 
+        nextOtp: res.nextOtp || '------', 
+        secondsRemaining, 
+        error: res.error 
+      };
+    }
+
+    // Format OTP code display space
+    function formatOTP(otp) {
+      if (otp.length === 6) {
+        return otp.substring(0, 3) + '<span class="code-gap"></span>' + otp.substring(3);
+      } else if (otp.length === 8) {
+        return otp.substring(0, 4) + '<span class="code-gap"></span>' + otp.substring(4);
+      }
+      return otp;
+    }
+
+    // Consistent gradient generation for account avatars based on issuer hash
+    function getIssuerColor(issuer) {
+      const name = (issuer || 'A').toUpperCase();
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      const colors = [
+        { primary: '#4f46e5', secondary: '#818cf8' }, // Indigo
+        { primary: '#0891b2', secondary: '#22d3ee' }, // Cyan
+        { primary: '#059669', secondary: '#34d399' }, // Emerald
+        { primary: '#ea580c', secondary: '#fb923c' }, // Orange
+        { primary: '#dc2626', secondary: '#f87171' }, // Red
+        { primary: '#db2777', secondary: '#f472b6' }, // Pink
+        { primary: '#7c3aed', secondary: '#a78bfa' }, // Violet
+        { primary: '#2563eb', secondary: '#60a5fa' }  // Blue
+      ];
+      const index = Math.abs(hash) % colors.length;
+      return colors[index];
+    }
+
+    // 5. Sound Generators (AudioContext Synthesizer)
+    function playBeep(type) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.type = 'sine';
+        if (type === 'success') {
+          // Double chirp
+          osc.frequency.setValueAtTime(800, ctx.currentTime);
+          gain.gain.setValueAtTime(0.04, ctx.currentTime);
+          osc.start();
+          osc.frequency.setValueAtTime(1400, ctx.currentTime + 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.24);
+          osc.stop(ctx.currentTime + 0.24);
+        } else if (type === 'copy') {
+          // Subtle click
+          osc.frequency.setValueAtTime(650, ctx.currentTime);
+          gain.gain.setValueAtTime(0.02, ctx.currentTime);
+          osc.start();
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+          osc.stop(ctx.currentTime + 0.1);
+        }
+      } catch (e) {
+        // Blocked by browser security / not supported
+      }
+    }
+
+    // 6. UI Toast Manager
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const icon = document.getElementById('toast-icon');
+      const msg = document.getElementById('toast-msg');
+      
+      toast.className = `toast-container toast-${type}`;
+      msg.textContent = message;
+      
+      // Update icon SVG
+      if (type === 'success') {
+        icon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+      } else if (type === 'error') {
+        icon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+      } else {
+        icon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+      }
+
+      toast.classList.add('active');
+      setTimeout(() => {
+        toast.classList.remove('active');
+      }, 3000);
+    }
+
+    // 7. Live DOM updates (Synchronized virtual state check to prevent DOM thrashing)
+    let isUpdating = false;
+
+    async function updateActiveCodes() {
+      if (isUpdating) return;
+      isUpdating = true;
+      
+      try {
+        const cards = document.querySelectorAll('.account-card');
+        
+        // Run code generation and DOM updates in parallel
+        await Promise.all(Array.from(cards).map(async (card) => {
+          const id = card.getAttribute('data-account-id');
+          const account = (tempAccount && tempAccount.id === id) 
+            ? tempAccount 
+            : ((instantAccount && instantAccount.id === id) ? instantAccount : accounts.find(a => a.id === id));
+          if (!account) return;
+          
+          const otpData = await getAccountOTP(account);
+          
+          if (otpData.error) {
+            const pinEl = card.querySelector('.pin-code');
+            if (pinEl) {
+              pinEl.textContent = 'ERROR';
+              pinEl.style.color = 'var(--color-danger)';
+              pinEl.style.fontSize = '1.3rem';
+              pinEl.title = otpData.error;
+            }
+            const timerTextEl = card.querySelector('.progress-timer-text');
+            if (timerTextEl) {
+              timerTextEl.textContent = '⚠️';
+              timerTextEl.style.color = 'var(--color-danger)';
+              timerTextEl.title = otpData.error;
+            }
+            return;
+          }
+
+          // Check state cache: only update DOM if values actually changed (prevents main-thread layout thrashing)
+          const state = cardStates[id] || { otp: '', secondsRemaining: -1 };
+          if (state.otp === otpData.otp && state.secondsRemaining === otpData.secondsRemaining) {
+            return;
+          }
+          
+          // Cache state
+          cardStates[id] = { otp: otpData.otp, secondsRemaining: otpData.secondsRemaining };
+          
+          // Update pin code text if it has changed
+          if (state.otp !== otpData.otp) {
+            const pinEl = card.querySelector('.pin-code');
+            if (pinEl && !pinEl.classList.contains('copied')) {
+              pinEl.innerHTML = formatOTP(otpData.otp);
+              pinEl.style.color = '';
+              pinEl.style.fontSize = '';
+              pinEl.title = 'Click to copy';
+            }
+          }
+
+          // Update next pin code text
+          const nextPinEl = card.querySelector('.next-pin');
+          if (nextPinEl && otpData.nextOtp && !nextPinEl.classList.contains('copied')) {
+            nextPinEl.innerHTML = formatOTP(otpData.nextOtp);
+          }
+          
+          // Update timer elements if they have changed
+          if (state.secondsRemaining !== otpData.secondsRemaining) {
+            const ringEl = card.querySelector('.progress-ring-fg');
+            const timerTextEl = card.querySelector('.progress-timer-text');
             
-            function renderSavedAccounts() {
-                const list = document.getElementById('saved-accounts-list');
-                list.innerHTML = ''; // Clear current list
-                
-                if (accounts.length > 0) {
-                    document.getElementById('load-card').style.display = 'block';
-                    
-                    accounts.forEach((acc, index) => {
-                        const row = document.createElement('div');
-                        row.className = 'account-row';
-                        
-                        // Main Launch Button
-                        const btn = document.createElement('button');
-                        btn.className = 'submit-btn btn-saved';
-                        btn.innerText = acc.name;
-                        btn.onclick = () => window.location.href = window.location.pathname + '?' + encodeURIComponent(acc.secret);
-                        
-                        // Delete Button (The Red X)
-                        const delBtn = document.createElement('button');
-                        delBtn.className = 'btn-delete';
-                        delBtn.innerHTML = '&times;';
-                        delBtn.title = 'Delete account';
-                        delBtn.onclick = (e) => {
-                            e.stopPropagation(); // Prevents accidental clicks on the row
-                            if (confirm(`Are you sure you want to remove "${acc.name}"?`)) {
-                                accounts.splice(index, 1); // Remove from array
-                                localStorage.setItem('fastAuthAccounts', JSON.stringify(accounts)); // Update storage
-                                renderSavedAccounts(); // Re-draw the list instantly
-                            }
-                        };
-                        
-                        row.appendChild(btn);
-                        row.appendChild(delBtn);
-                        list.appendChild(row);
-                    });
-                } else {
-                    document.getElementById('load-card').style.display = 'none';
-                }
+            if (timerTextEl) {
+              timerTextEl.textContent = otpData.secondsRemaining;
+              timerTextEl.style.color = '';
+              timerTextEl.title = '';
+            }
+            
+            if (ringEl) {
+              const period = account.period || 30;
+              const pct = otpData.secondsRemaining / period;
+              const circumference = 2 * Math.PI * 14; // ~87.96
+              const offset = circumference - (pct * circumference);
+              ringEl.style.strokeDashoffset = offset.toFixed(2);
+              
+              // Color indicator shift
+              let strokeColor = 'var(--color-success)';
+              if (otpData.secondsRemaining <= 5) {
+                strokeColor = 'var(--color-danger)';
+              } else if (otpData.secondsRemaining <= 10) {
+                strokeColor = 'var(--color-warning)';
+              }
+              ringEl.style.stroke = strokeColor;
             }
 
-            renderSavedAccounts();
+            // Horizontal progress bar updates (for detailed preview cards)
+            const barFillEl = card.querySelector('.progress-bar-fill');
+            const timerBarTextEl = card.querySelector('.progress-timer-text-bar');
+            
+            if (barFillEl) {
+              const period = account.period || 30;
+              const pct = otpData.secondsRemaining / period;
+              barFillEl.style.width = `${(pct * 100).toFixed(1)}%`;
+              
+              let barBg = 'var(--accent-gradient)';
+              if (otpData.secondsRemaining <= 5) {
+                barBg = 'var(--color-danger)';
+              } else if (otpData.secondsRemaining <= 10) {
+                barBg = 'var(--color-warning)';
+              }
+              barFillEl.style.background = barBg;
+            }
+            
+            if (timerBarTextEl) {
+              timerBarTextEl.textContent = `${otpData.secondsRemaining}s`;
+            }
+          }
+        }));
+      } catch (err) {
+        console.error("Error updating codes:", err);
+      } finally {
+        isUpdating = false;
+      }
+    }
 
-            // Clear All Saved Accounts functionality
-            document.getElementById('clear-saved').addEventListener('click', (e) => {
-                e.preventDefault();
-                if (confirm('Are you sure you want to delete ALL saved accounts from this browser?')) {
-                    accounts = [];
-                    localStorage.removeItem('fastAuthAccounts');
-                    renderSavedAccounts();
-                }
-            });
+    // 7b. Clipboard Copy Helper with Insecure Context Fallback
+    function copyTextToClipboard(text) {
+      return new Promise((resolve, reject) => {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(resolve, reject);
+        } else {
+          try {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            const successful = document.execCommand('copy');
+            document.body.removeChild(textarea);
+            if (successful) {
+              resolve();
+            } else {
+              reject(new Error('execCommand copy failed'));
+            }
+          } catch (err) {
+            reject(err);
+          }
         }
-    </script>
+      });
+    }
+
+    // 8. Clipboard Copy Operation
+    async function copyCode(text, element) {
+      if (text.includes('-')) return; // ignore placeholder dashes
+      try {
+        await copyTextToClipboard(text);
+        playBeep('copy');
+        showToast('Code copied to clipboard!', 'success');
+        
+        if (element) {
+          const originalHTML = element.innerHTML;
+          element.textContent = "COPIED";
+          element.classList.add('copied');
+          setTimeout(() => {
+            element.innerHTML = originalHTML;
+            element.classList.remove('copied');
+          }, 750);
+        }
+      } catch (err) {
+        console.error("Copy failed:", err);
+        showToast('Failed to copy to clipboard.', 'error');
+      }
+    }
+
+    // 9. QR Decoder & URI Parser
+    function parseOtpauthURI(uriString) {
+      try {
+        let uri = uriString.trim();
+        if (uri.startsWith('otpauth:') && !uri.startsWith('otpauth://')) {
+          uri = 'otpauth://' + uri.substring(8);
+        }
+        
+        const url = new URL(uri);
+        if (url.protocol !== 'otpauth:') throw new Error('Not otpauth');
+        
+        const type = url.hostname;
+        if (type !== 'totp') throw new Error('Only TOTP supported');
+        
+        const path = decodeURIComponent(url.pathname).replace(/^\//, '');
+        let label = path;
+        let issuer = '';
+        
+        if (path.indexOf(':') !== -1) {
+          const parts = path.split(':');
+          issuer = parts[0].trim();
+          label = parts.slice(1).join(':').trim();
+        }
+        
+        const params = url.searchParams;
+        const secret = params.get('secret');
+        if (!secret) throw new Error('No secret key');
+        
+        if (params.get('issuer')) {
+          issuer = params.get('issuer').trim();
+        }
+        
+        let algorithm = params.get('algorithm') || 'SHA1';
+        algorithm = algorithm.toUpperCase();
+        if (algorithm === 'SHA1') algorithm = 'SHA-1';
+        if (algorithm === 'SHA256') algorithm = 'SHA-256';
+        if (algorithm === 'SHA512') algorithm = 'SHA-512';
+        
+        const digits = parseInt(params.get('digits')) || 6;
+        const period = parseInt(params.get('period')) || 30;
+        
+        return {
+          secret: secret.trim(),
+          label: label.trim(),
+          issuer: issuer.trim() || 'Authenticator',
+          algorithm,
+          digits,
+          period
+        };
+      } catch (err) {
+        console.warn('URI Parsing error', err);
+        return null;
+      }
+    }
+
+    // Dynamic library loader from CDN
+    function loadQRScannerLibrary(callback) {
+      if (window.Html5Qrcode) {
+        callback();
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/html5-qrcode';
+      script.onload = () => callback();
+      script.onerror = () => showToast('Failed to load QR engine library.', 'error');
+      document.head.appendChild(script);
+    }
+
+    // Dynamic QR upload file receiver
+    function handleQRFileUpload(file) {
+      if (!file) return;
+      const statusEl = document.getElementById('file-upload-status');
+      statusEl.textContent = 'Decoding QR Code...';
+      statusEl.className = 'status-msg loading';
+      
+      loadQRScannerLibrary(async () => {
+        try {
+          const html5Qrcode = new Html5Qrcode("hidden-qr-reader");
+          const qrText = await html5Qrcode.scanFile(file, true);
+          
+          handleDecodedQR(qrText);
+          statusEl.textContent = 'Decoded successfully!';
+          statusEl.className = 'status-msg success';
+          playBeep('success');
+        } catch (err) {
+          console.error(err);
+          statusEl.textContent = 'No valid QR code found in this image.';
+          statusEl.className = 'status-msg error';
+        }
+      });
+    }
+
+    // Webcam scanning controller
+    async function startWebcamScanner() {
+      const preview = document.getElementById('webcam-preview');
+      preview.innerHTML = '<div class="placeholder-msg">Initializing camera...</div>';
+      
+      loadQRScannerLibrary(async () => {
+        try {
+          html5QrcodeScanner = new Html5Qrcode("webcam-preview");
+          const devices = await Html5Qrcode.getCameras();
+          if (devices && devices.length > 0) {
+            let cameraId = devices[0].id;
+            const backCamera = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('environment'));
+            if (backCamera) cameraId = backCamera.id;
+            
+            await html5QrcodeScanner.start(
+              cameraId,
+              { fps: 10, qrbox: { width: 220, height: 220 } },
+              qrText => {
+                handleDecodedQR(qrText);
+                stopWebcamScanner();
+                closeModal('add-modal');
+                playBeep('success');
+              },
+              errorMessage => {}
+            );
+            document.getElementById('stop-webcam-btn').style.display = 'inline-flex';
+          } else {
+            preview.innerHTML = '<div class="error-msg">No cameras detected on this device.</div>';
+          }
+        } catch (err) {
+          console.error(err);
+          preview.innerHTML = `<div class="error-msg">Camera Access Denied: ${err.message || err}</div>`;
+        }
+      });
+    }
+
+    function stopWebcamScanner() {
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.stop().then(() => {
+          html5QrcodeScanner = null;
+          document.getElementById('webcam-preview').innerHTML = '<div class="placeholder-msg">Camera stopped</div>';
+          document.getElementById('stop-webcam-btn').style.display = 'none';
+        }).catch(err => console.error(err));
+      }
+    }
+
+    function handleDecodedQR(qrText) {
+      const parsed = parseOtpauthURI(qrText);
+      if (parsed) {
+        document.getElementById('input-issuer').value = parsed.issuer;
+        document.getElementById('input-label').value = parsed.label;
+        document.getElementById('input-secret').value = parsed.secret;
+        document.getElementById('input-algorithm').value = parsed.algorithm;
+        document.getElementById('input-digits').value = parsed.digits;
+        document.getElementById('input-period').value = parsed.period;
+        
+        switchTab('manual');
+        showToast(`QR Decoded: ${parsed.issuer}`, 'success');
+      } else {
+        const rawSecret = qrText.trim().replace(/\s/g, '');
+        if (/^[A-Z2-7=]+$/i.test(rawSecret)) {
+          document.getElementById('input-secret').value = rawSecret.toUpperCase();
+          switchTab('manual');
+          showToast('Detected raw Secret Key!', 'success');
+        } else {
+          showToast('QR code contents not recognized.', 'error');
+        }
+      }
+    }
+
+    // 10. Local Storage CRUD Operations
+    function loadSavedAccounts() {
+      const raw = localStorage.getItem('fast2fa_accounts');
+      if (raw) {
+        try {
+          accounts = JSON.parse(raw);
+        } catch (e) {
+          accounts = [];
+        }
+      }
+    }
+
+    function saveAccounts() {
+      localStorage.setItem('fast2fa_accounts', JSON.stringify(accounts));
+      renderAccountsList();
+    }
+
+    function createAccountCardHTML(account, isTemp = false) {
+      if (account.id === 'instant-temp-acc') {
+        return `
+          <div class="account-card" data-account-id="${account.id}" style="flex-direction: column; align-items: stretch; padding: 24px; gap: 16px;">
+            <!-- Main code display -->
+            <div style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <div class="pin-code" onclick="copyCode(this.textContent.replace(/\\s/g, ''), this)" style="font-size: 2.8rem; letter-spacing: 2px; color: var(--accent-cyan); font-weight: 700; text-shadow: 0 0 16px rgba(6, 182, 212, 0.4); line-height: 1.2; user-select: all; cursor: pointer;" title="Click to copy current code">
+                ------
+              </div>
+              <div class="next-pin" onclick="copyCode(this.textContent.replace(/\\s/g, ''), this)" style="font-size: 1.3rem; color: var(--text-muted); font-weight: 600; opacity: 0.6; letter-spacing: 1px; cursor: pointer;" title="Click to copy next code">
+                ------
+              </div>
+            </div>
+            
+            <!-- Horizontal progress bar -->
+            <div style="display: flex; align-items: center; gap: 12px; width: 100%; margin: 4px 0;">
+              <div style="flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; position: relative;">
+                <div class="progress-bar-fill" style="width: 0%; height: 100%; background: var(--accent-gradient); border-radius: 10px; transition: width 0.3s ease, background-color 0.3s ease;"></div>
+              </div>
+              <span class="progress-timer-text-bar" style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); min-width: 28px; text-align: right; font-family: monospace;">--s</span>
+            </div>
+            
+            <!-- Secret Key -->
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; word-break: break-all; opacity: 0.55; font-family: monospace; line-height: 1.4; border-top: 1px solid var(--card-border); padding-top: 12px;">
+              Secret: ${escapeHTML(account.secret)}
+            </div>
+          </div>
+        `;
+      }
+
+      const colors = getIssuerColor(account.issuer);
+      const letter = (account.issuer || 'A').charAt(0).toUpperCase();
+      
+      return `
+        <div class="account-card" data-account-id="${account.id}">
+          <div class="account-info">
+            <div class="account-avatar" style="background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)">
+              ${letter}
+            </div>
+            <div class="account-details">
+              <div class="issuer-name">${escapeHTML(account.issuer)}</div>
+              <div class="account-label">${escapeHTML(account.label)}</div>
+            </div>
+          </div>
+          
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
+            <div class="code-wrapper">
+              <div class="pin-code" onclick="copyCode(this.textContent.replace(/\\s/g, ''), this)" title="Click to copy current code">
+                ------
+              </div>
+              
+              <div class="timer-container">
+                <svg class="progress-ring" viewBox="0 0 36 36">
+                  <circle class="progress-ring-bg" cx="18" cy="18" r="14" fill="none" stroke-width="3.5"></circle>
+                  <circle class="progress-ring-fg" cx="18" cy="18" r="14" fill="none" stroke-width="3.5" stroke-dasharray="88" stroke-dashoffset="0"></circle>
+                </svg>
+                <span class="progress-timer-text">--</span>
+              </div>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); opacity: 0.8; margin-right: 52px; cursor: pointer; user-select: none;" title="Click to copy next code" onclick="copyCode(this.querySelector('.next-pin').textContent.replace(/\\s/g, ''), this.querySelector('.next-pin'))">
+              Next: <span class="next-pin" style="transition: color 0.15s ease;">------</span>
+            </div>
+          </div>
+
+          ${!isTemp ? `
+          <div class="card-actions">
+            <button class="btn-icon" onclick="editAccount('${account.id}')" title="Edit account" style="color: var(--text-secondary); border-color: var(--card-border); margin-right: 4px;">
+              <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            </button>
+            <button class="btn-icon" onclick="deleteAccount('${account.id}')" title="Delete account" style="color: var(--color-danger); border-color: rgba(239,68,68,0.15)">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+          </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderAccountsList(filtered = accounts) {
+      const grid = document.getElementById('accounts-grid');
+      const emptyState = document.getElementById('empty-state');
+      const searchPanel = document.getElementById('search-panel');
+      const badge = document.getElementById('accounts-badge');
+      
+      badge.textContent = accounts.length;
+
+      // Clear the visual states cache to force a fresh DOM rendering on new card loads
+      for (const key in cardStates) {
+        delete cardStates[key];
+      }
+
+      const emptyFooter = document.getElementById('empty-footer-card');
+      const emptyIllustration = document.getElementById('empty-illustration');
+      const emptyTitle = document.getElementById('empty-title');
+
+      if (accounts.length === 0) {
+        emptyState.style.display = 'flex';
+        if (emptyIllustration) emptyIllustration.style.display = 'flex';
+        if (emptyTitle) emptyTitle.style.display = 'block';
+        emptyFooter.style.display = 'flex';
+        searchPanel.style.display = 'none';
+        grid.innerHTML = '';
+      } else {
+        emptyState.style.display = 'flex';
+        if (emptyIllustration) emptyIllustration.style.display = 'none';
+        if (emptyTitle) emptyTitle.style.display = 'none';
+        emptyFooter.style.display = 'none';
+        searchPanel.style.display = 'block';
+        
+        if (filtered.length === 0) {
+          grid.innerHTML = '<div style="text-align: center; padding: 32px; color: var(--text-muted); font-size: 0.9rem;">No matching accounts found</div>';
+        } else {
+          grid.innerHTML = filtered.map(a => createAccountCardHTML(a)).join('');
+        }
+      }
+      // Trigger instant calculation
+      updateActiveCodes();
+    }
+
+    function filterAccounts() {
+      const query = document.getElementById('search-bar').value.toLowerCase().trim();
+      if (!query) {
+        renderAccountsList(accounts);
+        return;
+      }
+      const filtered = accounts.filter(a => 
+        a.issuer.toLowerCase().includes(query) || 
+        a.label.toLowerCase().includes(query)
+      );
+      renderAccountsList(filtered);
+    }
+
+    // Form Submissions
+    function saveManualAccount() {
+      const issuer = document.getElementById('input-issuer').value.trim();
+      const label = document.getElementById('input-label').value.trim();
+      const secret = document.getElementById('input-secret').value.replace(/\s/g, '').toUpperCase();
+      
+      const algorithm = document.getElementById('input-algorithm').value;
+      const digits = parseInt(document.getElementById('input-digits').value);
+      const period = parseInt(document.getElementById('input-period').value) || 30;
+
+      if (!secret) {
+        showToast('Please enter a Secret Key.', 'error');
+        return;
+      }
+
+      // Check if base32 is valid
+      try {
+        base32ToBytes(secret);
+      } catch (e) {
+        showToast('Invalid Base32 Secret Key structure.', 'error');
+        return;
+      }
+
+      const newAccount = {
+        id: 'acc-' + Date.now(),
+        issuer: issuer || 'Authenticator',
+        label: label || '2FA Code',
+        secret,
+        algorithm,
+        digits,
+        period
+      };
+
+      accounts.push(newAccount);
+      saveAccounts();
+      
+      // Reset inputs
+      document.getElementById('input-issuer').value = '';
+      document.getElementById('input-label').value = '';
+      document.getElementById('input-secret').value = '';
+      closeModal('add-modal');
+      showToast('Account added successfully!', 'success');
+      playBeep('success');
+    }
+
+    function saveBulkAccounts() {
+      const textarea = document.getElementById('input-bulk');
+      if (!textarea) return;
+      
+      const lines = textarea.value.split('\n');
+      let added = 0;
+      let duplicates = 0;
+      let failed = 0;
+      
+      lines.forEach((line, index) => {
+        const trimmed = line.trim();
+        if (!trimmed) return;
+        
+        let account = null;
+        // Parse as raw base32 secret
+        const cleanSecret = trimmed.replace(/\s/g, '').toUpperCase();
+        if (/^[A-Z2-7=]+$/i.test(cleanSecret)) {
+          try {
+            base32ToBytes(cleanSecret); // validate
+            account = {
+              id: 'acc-' + (Date.now() + added + index),
+              issuer: 'Bulk Code',
+              label: 'Key ' + (accounts.length + added + 1),
+              secret: cleanSecret,
+              algorithm: 'SHA-1',
+              digits: 6,
+              period: 30
+            };
+          } catch (e) {
+            // Invalid base32
+          }
+        }
+        
+        if (account) {
+          // Check for duplicate combination of issuer, label, and secret
+          const isDuplicate = accounts.some(a => 
+            a.secret === account.secret && 
+            a.issuer === account.issuer && 
+            a.label === account.label
+          );
+          if (!isDuplicate) {
+            accounts.push(account);
+            added++;
+          } else {
+            duplicates++;
+          }
+        } else {
+          failed++;
+        }
+      });
+      
+      if (added > 0) {
+        saveAccounts();
+        let msg = `Successfully added ${added} account(s)!`;
+        if (duplicates > 0) msg += ` (${duplicates} duplicates skipped)`;
+        if (failed > 0) msg += ` (${failed} invalid lines skipped)`;
+        showToast(msg, 'success');
+        playBeep('success');
+        
+        // Reset textarea and close modal
+        textarea.value = '';
+        closeModal('add-modal');
+      } else {
+        if (duplicates > 0 && failed > 0) {
+          showToast(`Skipped ${duplicates} duplicates and ${failed} invalid lines. No new accounts added.`, 'error');
+        } else if (duplicates > 0) {
+          showToast(`All ${duplicates} accounts already exist.`, 'info');
+        } else if (failed > 0) {
+          showToast(`Invalid input format. No valid accounts found.`, 'error');
+        } else {
+          showToast('Please enter some keys or URIs first.', 'error');
+        }
+      }
+    }
+
+    async function deleteAccount(id) {
+      const confirmed = await showConfirm(
+        'Delete Authenticator',
+        'Are you sure you want to delete this authenticator? This operation cannot be undone.',
+        true
+      );
+      if (confirmed) {
+        accounts = accounts.filter(a => a.id !== id);
+        saveAccounts();
+        showToast('Account deleted.', 'info');
+      }
+    }
+
+    function editAccount(id) {
+      const account = accounts.find(a => a.id === id);
+      if (!account) return;
+      
+      document.getElementById('edit-account-id').value = id;
+      document.getElementById('edit-issuer').value = account.issuer === 'Authenticator' ? '' : (account.issuer || '');
+      document.getElementById('edit-label').value = account.label === '2FA Code' ? '' : (account.label || '');
+      document.getElementById('edit-secret').value = account.secret || '';
+      document.getElementById('edit-algorithm').value = account.algorithm || 'SHA-1';
+      document.getElementById('edit-digits').value = account.digits || '6';
+      document.getElementById('edit-period').value = account.period || 30;
+      
+      // Close advanced accordion by default
+      const toggle = document.getElementById('edit-advanced-toggle');
+      const body = document.getElementById('edit-advanced-body');
+      if (toggle) toggle.classList.remove('active');
+      if (body) body.classList.remove('active');
+
+      openModal('edit-modal');
+    }
+
+    function updateSavedAccount() {
+      const id = document.getElementById('edit-account-id').value;
+      const accountIndex = accounts.findIndex(a => a.id === id);
+      if (accountIndex === -1) return;
+      
+      const issuer = document.getElementById('edit-issuer').value.trim();
+      const label = document.getElementById('edit-label').value.trim();
+      const secret = document.getElementById('edit-secret').value.replace(/\s/g, '').toUpperCase();
+      const algorithm = document.getElementById('edit-algorithm').value;
+      const digits = parseInt(document.getElementById('edit-digits').value);
+      const period = parseInt(document.getElementById('edit-period').value) || 30;
+      
+      if (!secret) {
+        showToast('Please enter a Secret Key.', 'error');
+        return;
+      }
+      
+      try {
+        base32ToBytes(secret);
+      } catch (e) {
+        showToast('Invalid Base32 Secret Key structure.', 'error');
+        return;
+      }
+      
+      accounts[accountIndex] = {
+        id,
+        issuer: issuer || 'Authenticator',
+        label: label || '2FA Code',
+        secret,
+        algorithm,
+        digits,
+        period
+      };
+      
+      saveAccounts();
+      closeModal('edit-modal');
+      showToast('Account updated successfully!', 'success');
+      playBeep('success');
+    }
+
+    function toggleEditAdvancedSettings() {
+      const toggle = document.getElementById('edit-advanced-toggle');
+      const body = document.getElementById('edit-advanced-body');
+      if (toggle) toggle.classList.toggle('active');
+      if (body) body.classList.toggle('active');
+    }
+
+    // 11. URL Parameters & Path Router (Support instant loading & auto-copying)
+    function getSecretFromURL() {
+      // 1. Check Hash e.g. #JBSWY3DPEHPK3PXP
+      const hash = window.location.hash.slice(1).trim().replace(/\s/g, '');
+      if (hash && /^[A-Z2-7=]+$/i.test(hash)) {
+        return { secret: hash.toUpperCase(), source: 'hash' };
+      }
+      
+      // 2. Check Search Parameters
+      const search = window.location.search.slice(1).trim();
+      if (search) {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('secret')) {
+          return {
+            secret: params.get('secret').trim().toUpperCase(),
+            issuer: params.get('issuer') || 'Link Account',
+            label: params.get('label') || 'Quick Access',
+            algorithm: params.get('algorithm') || 'SHA-1',
+            digits: parseInt(params.get('digits')) || 6,
+            period: parseInt(params.get('period')) || 30,
+            source: 'params'
+          };
+        }
+        if (params.has('otpauth')) {
+          const parsed = parseOtpauthURI(params.get('otpauth'));
+          if (parsed) {
+            return { ...parsed, source: 'otpauth' };
+          }
+        }
+        // Raw query e.g. ?JBSWY3DPEHPK3PXP
+        const rawSearch = search.replace(/\s/g, '');
+        if (/^[A-Z2-7=]+$/i.test(rawSearch)) {
+          return { secret: rawSearch.toUpperCase(), source: 'search' };
+        }
+      }
+      
+      // 3. Check Pathname routing e.g. /JBSWY3DPEHPK3PXP
+      const path = window.location.pathname.replace(/^\//, '').trim().replace(/\s/g, '');
+      if (path && path !== 'index.html' && /^[A-Z2-7=]+$/i.test(path)) {
+        return { secret: path.toUpperCase(), source: 'path' };
+      }
+      
+      return null;
+    }
+
+    function handleURLParams() {
+      const urlData = getSecretFromURL();
+      if (!urlData) return;
+      
+      tempAccount = {
+        id: 'temp-url-account',
+        secret: urlData.secret,
+        issuer: urlData.issuer || 'Link Account',
+        label: urlData.label || 'Quick Access',
+        algorithm: urlData.algorithm || 'SHA-1',
+        digits: urlData.digits || 6,
+        period: urlData.period || 30
+      };
+      
+      // Show temporary segment
+      document.getElementById('url-account-section').style.display = 'block';
+      document.getElementById('temp-card-container').innerHTML = createAccountCardHTML(tempAccount, true);
+      
+      
+      // Instant code calculation and automatic clipboard copy!
+      getAccountOTP(tempAccount).then(otpData => {
+        if (otpData && otpData.otp && !otpData.error) {
+          copyCode(otpData.otp);
+          showToast('Code copied to clipboard!', 'success');
+        }
+      });
+    }
+
+    function saveTempAccount() {
+      if (!tempAccount) return;
+      
+      // Prefill the manual inputs in the modal
+      document.getElementById('input-issuer').value = tempAccount.issuer === 'Link Account' ? '' : tempAccount.issuer;
+      document.getElementById('input-label').value = tempAccount.label === 'Quick Access' ? '' : tempAccount.label;
+      document.getElementById('input-secret').value = tempAccount.secret;
+      document.getElementById('input-algorithm').value = tempAccount.algorithm || 'SHA-1';
+      document.getElementById('input-digits').value = tempAccount.digits || '6';
+      document.getElementById('input-period').value = tempAccount.period || 30;
+      
+      // Open the modal
+      openModal('add-modal');
+      switchTab('manual');
+      
+      // Dismiss the temporary URL preview banner
+      dismissTempAccount();
+    }
+
+    function dismissTempAccount() {
+      tempAccount = null;
+      document.getElementById('url-account-section').style.display = 'none';
+      document.getElementById('temp-card-container').innerHTML = '';
+    }
+
+    // 12. Backup JSON Import/Export Operations
+    function exportBackup() {
+      if (accounts.length === 0) {
+        showToast('No saved accounts to backup.', 'error');
+        return;
+      }
+      const dataStr = JSON.stringify(accounts, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const date = new Date().toISOString().split('T')[0];
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `fast2fa-backup-${date}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Backup file downloaded.', 'success');
+    }
+
+    function importBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!Array.isArray(imported)) throw new Error('Not an array');
+          
+          let added = 0;
+          imported.forEach(item => {
+            if (item.secret) {
+              const finalIssuer = item.issuer || 'Authenticator';
+              const finalLabel = item.label || '2FA Code';
+              // Avoid duplicates
+              const dup = accounts.find(a => 
+                a.secret === item.secret && 
+                (a.issuer || 'Authenticator') === finalIssuer && 
+                (a.label || '2FA Code') === finalLabel
+              );
+              if (!dup) {
+                accounts.push({
+                  id: 'acc-' + (Date.now() + added),
+                  issuer: finalIssuer,
+                  label: finalLabel,
+                  secret: item.secret,
+                  algorithm: item.algorithm || 'SHA-1',
+                  digits: item.digits || 6,
+                  period: item.period || 30
+                });
+                added++;
+              }
+            }
+          });
+          
+          if (added > 0) {
+            saveAccounts();
+            showToast(`Successfully imported ${added} accounts!`, 'success');
+            playBeep('success');
+          } else {
+            showToast('No new accounts found in backup file.', 'info');
+          }
+          closeModal('settings-modal');
+        } catch (err) {
+          showToast('Failed to parse backup file. Invalid layout.', 'error');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = ''; // clear input
+    }
+
+    async function clearAllData() {
+      const confirmed1 = await showConfirm(
+        'Wipe All Data',
+        '🚨 WARNING: This will permanently delete all 2FA accounts saved on this device. There is no recovery. Are you absolutely sure?',
+        true
+      );
+      if (confirmed1) {
+        const confirmed2 = await showConfirm(
+          'Final Confirmation',
+          'Final Warning: Are you absolutely sure you want to delete everything?',
+          true
+        );
+        if (confirmed2) {
+          accounts = [];
+          saveAccounts();
+          dismissTempAccount();
+          closeModal('settings-modal');
+          showToast('All device data cleared.', 'info');
+        }
+      }
+    }
+
+    // 13. UI Navigation & Helpers (Overlay Modals)
+    function openModal(id) {
+      const backdrop = document.getElementById(id);
+      if (!backdrop) return;
+      
+      // Close other modals first
+      document.querySelectorAll('.modal-backdrop').forEach(b => {
+        if (b.id !== id) closeModal(b.id);
+      });
+      
+      document.body.classList.add('modal-open');
+      backdrop.style.display = 'flex';
+      
+      // Trigger CSS animation on next tick
+      setTimeout(() => {
+        backdrop.classList.add('active');
+      }, 10);
+
+      // Auto-switch to manual tab when opening add modal
+      if (id === 'add-modal') {
+        switchTab('manual');
+      }
+    }
+
+    function closeModal(id) {
+      const backdrop = document.getElementById(id);
+      if (!backdrop) return;
+      
+      backdrop.classList.remove('active');
+      
+      // Stop camera if closing add modal
+      if (id === 'add-modal') {
+        stopWebcamScanner();
+      }
+      
+      // Hide display after transition runs
+      setTimeout(() => {
+        if (!backdrop.classList.contains('active')) {
+          backdrop.style.display = 'none';
+          
+          // Remove body lock if no active modals remain
+          const anyActive = document.querySelector('.modal-backdrop.active');
+          if (!anyActive) {
+            document.body.classList.remove('modal-open');
+          }
+        }
+      }, 220);
+    }
+
+    // Escape Key Listener for Modals
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const activeModal = document.querySelector('.modal-backdrop.active');
+        if (activeModal) {
+          closeModal(activeModal.id);
+        }
+      }
+    });
+
+    // Custom Confirmation Dialog (Promise-based)
+    function showConfirm(title, message, isDanger = false) {
+      return new Promise((resolve) => {
+        const backdrop = document.getElementById('confirm-modal');
+        const titleEl = document.getElementById('confirm-title');
+        const msgEl = document.getElementById('confirm-msg');
+        const cancelBtn = document.getElementById('confirm-cancel');
+        const okBtn = document.getElementById('confirm-ok');
+        
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+        
+        if (isDanger) {
+          okBtn.style.background = 'var(--color-danger)';
+          okBtn.style.color = '#ffffff';
+        } else {
+          okBtn.style.background = 'var(--accent-gradient)';
+          okBtn.style.color = '#ffffff';
+        }
+        
+        const onCancel = () => {
+          closeModal('confirm-modal');
+          resolve(false);
+        };
+        
+        const onOk = () => {
+          closeModal('confirm-modal');
+          resolve(true);
+        };
+        
+        cancelBtn.onclick = onCancel;
+        okBtn.onclick = onOk;
+        
+        openModal('confirm-modal');
+      });
+    }
+
+    function switchTab(tab) {
+      // Deactivate all
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      // Stop webcam if switching away from it
+      if (tab !== 'camera') {
+        stopWebcamScanner();
+      }
+
+      // Activate selected
+      document.getElementById(`tab-${tab}`).classList.add('active');
+      document.getElementById(`content-${tab}`).classList.add('active');
+
+      // Update footer save button based on active tab
+      const saveBtn = document.getElementById('add-modal-save-btn');
+      if (saveBtn) {
+        if (tab === 'manual') {
+          saveBtn.style.display = 'inline-flex';
+          saveBtn.textContent = 'Save Account';
+          saveBtn.onclick = saveManualAccount;
+        } else if (tab === 'bulk') {
+          saveBtn.style.display = 'inline-flex';
+          saveBtn.textContent = 'Save Accounts';
+          saveBtn.onclick = saveBulkAccounts;
+        } else {
+          saveBtn.style.display = 'none';
+        }
+      }
+    }
+
+    function toggleAdvancedSettings() {
+      const toggle = document.getElementById('advanced-toggle');
+      const body = document.getElementById('advanced-body');
+      
+      toggle.classList.toggle('active');
+      body.classList.toggle('active');
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+
+    // 14. File Upload Drag & Drop Listeners
+    const dropZone = document.getElementById('drag-drop-zone');
+    const fileInput = document.getElementById('qr-file-input');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleQRFileUpload(e.dataTransfer.files[0]);
+      }
+    });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files && fileInput.files.length > 0) {
+        handleQRFileUpload(fileInput.files[0]);
+      }
+    });
+
+    // 14b. Empty State Instant Generator Logic
+    let instantAccount = null;
+
+    document.getElementById('empty-instant-secret').addEventListener('input', (e) => {
+      const val = e.target.value.trim().replace(/\s/g, '').toUpperCase();
+      const previewContainer = document.getElementById('instant-preview-container');
+      const errorEl = document.getElementById('instant-error');
+      
+      if (!val) {
+        previewContainer.innerHTML = '';
+        errorEl.style.display = 'none';
+        instantAccount = null;
+        return;
+      }
+      
+      try {
+        base32ToBytes(val);
+        errorEl.style.display = 'none';
+        
+        instantAccount = {
+          id: 'instant-temp-acc',
+          secret: val,
+          issuer: 'Instant Generator',
+          label: 'Active Code',
+          algorithm: 'SHA-1',
+          digits: 6,
+          period: 30
+        };
+        
+        previewContainer.innerHTML = `
+          <div style="margin-top: 14px; width: 100%; display: flex; flex-direction: column; gap: 10px; text-align: left;">
+            ${createAccountCardHTML(instantAccount, true)}
+            <div style="display: flex; gap: 8px; width: 100%;">
+              <button class="btn-primary" onclick="saveInstantAccount()" style="flex: 1; justify-content: center; height: 38px; font-size: 0.85rem;">Save to Device</button>
+              <button class="btn-secondary" onclick="copyInstantShareLink()" style="flex: 1; justify-content: center; height: 38px; font-size: 0.85rem;">Copy Link</button>
+            </div>
+          </div>
+        `;
+        
+        delete cardStates[instantAccount.id];
+        updateActiveCodes();
+        
+        // Auto-copy the newly pasted code
+        getAccountOTP(instantAccount).then(otpData => {
+          if (otpData && otpData.otp && !otpData.error) {
+            copyCode(otpData.otp);
+          }
+        });
+      } catch (err) {
+        previewContainer.innerHTML = '';
+        instantAccount = null;
+        if (val.length >= 8) {
+          errorEl.textContent = 'Invalid Base32 characters (A-Z, 2-7)';
+          errorEl.style.display = 'block';
+        } else {
+          errorEl.style.display = 'none';
+        }
+      }
+    });
+
+    function saveInstantAccount() {
+      if (!instantAccount) return;
+      document.getElementById('input-issuer').value = 'Instant Code';
+      document.getElementById('input-label').value = 'Saved';
+      document.getElementById('input-secret').value = instantAccount.secret;
+      
+      openModal('add-modal');
+      switchTab('manual');
+    }
+
+    function copyInstantShareLink() {
+      if (!instantAccount) return;
+      const shareUrl = `${window.location.origin}${window.location.pathname}?${instantAccount.secret}`;
+      copyTextToClipboard(shareUrl).then(() => {
+        playBeep('success');
+        showToast('Shareable link copied!', 'success');
+      }).catch(err => {
+        console.error("Copy link failed:", err);
+        showToast('Failed to copy link.', 'error');
+      });
+    }
+
+    // 15. Initial Bootup Execution
+    if (!window.crypto || !window.crypto.subtle) {
+      const cryptoWarning = document.getElementById('crypto-warning');
+      if (cryptoWarning) cryptoWarning.style.display = 'block';
+    }
+    loadSavedAccounts();
+    renderAccountsList();
+    handleURLParams();
+
+    // Core Timing Loop (Runs every 1 second)
+    setInterval(() => {
+      updateActiveCodes();
+    }, 1000);
+
+    // Initial calculation trigger
+    updateActiveCodes();
+
+    // 16. Service Worker registration (Offline PWA)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker registered successfully.', reg.scope))
+          .catch(err => console.log('Service Worker registration failed: ', err));
+      });
+    }
+
+    // PWA Install prompt interceptor
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const installBtn = document.getElementById('pwa-install-btn');
+      if (installBtn) installBtn.style.display = 'flex';
+    });
+
+    function installPWA() {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('PWA installation accepted');
+        }
+        deferredPrompt = null;
+        const installBtn = document.getElementById('pwa-install-btn');
+        if (installBtn) installBtn.style.display = 'none';
+      });
+    }
+  </script>
 </body>
 </html>
