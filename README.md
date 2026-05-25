@@ -1,80 +1,55 @@
-# 🔐 Fast Authenticator (v2.1.0)
+⚡ Fast Authenticator
+A radically simple, premium, and 100% client-side Time-Based One-Time Password (TOTP) generator. Designed with state-of-the-art glassmorphism aesthetics, Fast Authenticator keeps your two-factor authentication keys completely secure by calculating them directly within your browser. No servers, no tracking, zero databases, and fully functional offline.
 
-A radically simple, single-file Time-Based One-Time Password (TOTP) generator compatible with Google Authenticator. Runs 100% client-side in your browser for maximum privacy.
+✨ Key Features
+🛡️ 100% Client-Side Web Crypto: Cryptographic signatures are calculated locally using the browser's native Web Crypto API (window.crypto.subtle) for sandboxed, secure execution.
+📱 Adaptive Overlay System: Sleek floating cards on desktop viewports and smooth sliding bottom-drawer sheets on mobile screens running at a locked, GPU-accelerated 60 FPS.
+📂 Flexible Entry Formats:
+Camera QR Scanner: Scan visual codes via integrated camera access.
+Upload QR Image: Drag and drop or browse standard images (PNG, JPG) containing codes.
+Manual Entry: Save accounts with customized issuers, labels, and advanced settings.
+List Import (Bulk): Paste raw Base32 secret keys line-by-line to add multiple keys instantly.
+⏳ Upcoming Code Preview: Displays the upcoming code directly underneath the active one, allowing you to copy not only the current OTP but the next token with a single click.
+💾 Local Data Portability: Save accounts directly in your browser's local storage. Easily export and import your saved accounts as standard JSON backup files, or wipe all device data securely with double-confirmation dialogs.
+📲 Installable PWA & Offline Support: Fully compliant Web App Manifest and Service Worker implementation, allowing you to install the application natively on iOS/Android and run it entirely offline.
+🌐 Insecure Context Fallback: Automatic, silent fallback to a custom, pure JavaScript cryptographic engine (SHA-1, SHA-256, SHA-512) and fallback clipboard operations if hosted in HTTP or local development server environments.
+🛠️ Technology Stack
+Core: HTML5, Vanilla JavaScript, CSS custom variables
+Cryptography: Web Crypto API (window.crypto.subtle)
+Webcam Scanning: html5-qrcode (lazy-loaded dynamically only when camera or upload features are triggered)
+Caching: PWA Service Worker caching static assets and Google Fonts
+Aesthetics: Glassmorphic backdrops, harmonious HSL dark/light modes, micro-animations, and Outfit/Plus Jakarta Sans typography.
+🔒 Security & Privacy Guarantees
+IMPORTANT
 
-Fast Authenticator is designed for speed, low friction, and ultimate portability. Instead of forcing you to unlock your phone, open a dedicated app, and manually type a code, this tool allows you to access your 2FA codes instantly via a secure, bookmarkable URL or your browser's local storage.
+Your keys never leave your browser context. Since Fast Authenticator is static and serverless, there are no endpoints, cookies, logins, or tracking pixels to compromise your data.
 
-## ✨ Key Features
+HMAC calculation is completely sandboxed.
+Service Worker operates as a local proxy, guaranteeing offline functionality.
+Important Storage Warning: Browser localStorage stores secrets unencrypted. Make sure your device profile or operating system is password protected, and avoid using the app on shared public profiles.
+🚀 How to Use
+1. Directly in your browser
+Simply visit 2fa.fast (fully secure HTTPS context) to start generating codes instantly.
 
-* **100% Client-Side & Private:** All cryptography is handled locally in your browser using the native Web Crypto API. **Your secret key never leaves your device** and is never sent to a server.
-* **💾 Local Account Manager:** Save your most frequently used 2FA accounts directly to your browser for quick access. Next time you open the app, your accounts will appear as quick-launch buttons. Manage your list easily with individual or bulk deletion.
-* **Progressive Web App (PWA) Ready:** Save the link directly to your iOS or Android home screen. It has an embedded manifest and SVG icon, meaning it behaves exactly like a native, full-screen mobile app without the browser address bar.
-* **Host Anywhere for Free:** Because it requires no server-side processing, you can host this on free static platforms like GitHub Pages, Netlify, Cloudflare Pages, or even just open it as a local file on your computer.
-* **Ultra-Portable (Single File):** The entire application—HTML layout, responsive CSS, PWA manifest, and JavaScript engine—is packed into one single `index.html` file.
-* **Zero-Login Access:** Access your 2FA code via a single link (e.g., `https://your-site.github.io/?YOUR_SECRET_KEY`). Bookmark it for instant, one-click access. 
-* **Seamless Sharing:** Want to give a trusted family member or colleague access to a specific 2FA code? Just send them the link. If they have the link, they have the code.
-* **Frictionless Click-to-Copy:** Simply click or tap the generated 6-digit PIN to instantly copy it to your clipboard for immediate pasting.
+2. Self-Host Offline (Direct File Execution)
+Fast Authenticator is built as a single, self-contained HTML document. You can run the app offline on your computer without running a web server:
 
-## 🚀 How to Host & Use (GitHub Pages)
+Clone this repository or download the ZIP:
+bash
 
-1. **Create a Repository:** Go to GitHub, create a new public repository, and upload the `index.html` file to it.
-2. **Enable Pages:** Go to your repository's **Settings** > **Pages**, set the source branch to `main`, and click Save.
-3. **Get Your Link:** Wait a minute for GitHub to build your site. Your base URL will be `https://[your-username].github.io/[repo-name]/`.
-4. **Add Your Key:** Append your Base32 secret key to the end of your new URL preceded by a question mark: `https://[your-username].github.io/fast-auth/?JBSWY3DPEHPK3PXP`
-5. **Bookmark or Save It:** You can either bookmark that exact URL, or use the "Save to this device" feature at the bottom of the screen to save it securely to your browser.
+git clone https://github.com/yuriionline/2fafast.git
+Open index.html directly in any web browser.
+Add your keys to begin generating codes locally.
+3. URL Parameter Pre-loading (GET)
+To quickly pre-load a temporary account, copy a code, or save a token, append the raw Base32 secret key directly to the URL:
 
-## 📱 How to Install as an App (PWA)
+https://2fa.fast/?YOUR_SECRET_KEY
+This loads a temporary preview card on the main page, automatically copies the generated code, and provides a one-click button to save it persistently on your device.
 
-You can install Fast Authenticator directly to your phone's home screen so it functions like a native app:
+⚙️ Advanced Configuration Support
+Fast Authenticator supports the full range of standard Authenticator algorithms and parameters:
 
-* **On iOS (Safari):** Open your base URL, tap the **Share** button at the bottom of the screen, scroll down, and tap **"Add to Home Screen"**.
-* **On Android (Chrome):** Open your base URL, tap the **Three Dots (Menu)** icon in the top right, and tap **"Add to Home screen"** or **"Install app"**.
-
-## ⚠️ Security Considerations
-
-Fast Authenticator intentionally trades traditional login layers for maximum convenience. **Please read these warnings carefully:**
-
-* **The Privacy Advantage:** Because v2.1.0 is purely client-side, your secret key is never recorded in any server logs. 
-* **The Local Storage Warning:** If you use the "Save Account" feature, your secret key is stored in your browser's `localStorage`. **Do not use this feature on a shared or public computer**, as anyone opening the site on that browser profile will have access to your codes.
-* **Protect Your Link:** If you use the URL method, treat your custom URL exactly like a password. Anyone who possesses the link possesses the ability to generate your 2FA codes.
-* **Browser History:** Standard browsers will save URL parameters in your local history. Using this inside a secure workspace or Private/Incognito profile is highly recommended for highly sensitive accounts.
-
-## 📝 License
-
-This project is open-source and available under the **MIT License**. You are free to copy, modify, and distribute it as needed.# 🔐 Fast Authenticator (v2.0.0)
-
-A radically simple, single-file Time-Based One-Time Password (TOTP) generator compatible with Google Authenticator. 
-
-Fast Authenticator is designed for speed, low friction, and ultimate portability. Instead of forcing you to unlock your phone, open a dedicated app, and manually type a code, this tool allows you to access your 2FA codes instantly via a single, bookmarkable URL. 
-
-## ✨ Key Features
-
-* **100% Client-Side & Private:** All cryptography is handled locally in your browser using the native Web Crypto API. **Your secret key never leaves your device** and is never sent to a server.
-* **Host Anywhere for Free:** Because it requires no server-side processing (like PHP or Node.js), you can host this on free static platforms like GitHub Pages, Netlify, Cloudflare Pages, or even just open it as a local file on your computer.
-* **Ultra-Portable (Single File):** The entire application—HTML layout, responsive CSS, and JavaScript engine—is packed into one single `index.html` file.
-* **Zero-Login Access:** Access your 2FA code via a single link (e.g., `https://your-site.github.io/?YOUR_SECRET_KEY`). Bookmark it in your browser or password manager for instant, one-click access. 
-* **Seamless Sharing:** Want to give a trusted family member or colleague access to a specific 2FA code? Just send them the link. No need to set up accounts or share master passwords. If they have the link, they have the code.
-* **Frictionless Click-to-Copy:** Simply click or tap the generated 6-digit PIN to instantly copy it to your clipboard for immediate pasting.
-
-## 🚀 How to Host & Use (GitHub Pages)
-
-1. **Create a Repository:** Go to GitHub, create a new public repository (e.g., `fast-auth`), and upload this `index.html` file to it.
-2. **Enable Pages:** Go to your repository's **Settings** > **Pages**, set the source branch to `main`, and click Save.
-3. **Get Your Link:** Wait a minute for GitHub to build your site. Your base URL will be `https://[your-username].github.io/[repo-name]/`.
-4. **Add Your Key:** Append your Base32 secret key to the end of your new URL preceded by a question mark: `https://[your-username].github.io/fast-auth/?JBSWY3DPEHPK3PXP`
-5. **Bookmark It:** Save that exact URL. Whenever you need your code, simply click the link.
-
-*Note: If you navigate to the site without a key, it will present a clean UI where you can paste your secret key to generate your custom URL automatically.*
-
-## ⚠️ Security Considerations (The "Hidden Link" Model)
-
-Fast Authenticator intentionally trades traditional login layers for maximum convenience. By passing the secret key through the URL query string, **the URL itself becomes the key to your 2FA codes.**
-
-* **The Privacy Advantage:** Because v2.0.0 is purely client-side, your secret key is never recorded in any server logs. 
-* **Protect Your Link:** Treat your custom URL exactly like a password. Save it in a secure, encrypted password manager or a locked notes app. 
-* **Beware of Shared Devices:** Do not leave this link bookmarked in plain sight on a shared or public computer. Anyone who possesses the link possesses the ability to generate your 2FA codes.
-* **Browser History:** Standard browsers will save this URL in your local history. Using this inside a secure workspace or Private/Incognito profile is highly recommended for sensitive accounts.
-
-## 📝 License
-
-This project is open-source and available under the **MIT License**. You are free to copy, modify, and distribute it as needed.
+Parameter	Supported Options	Default
+Algorithm	SHA-1, SHA-256, SHA-512	SHA-1
+Digits	6 digits, 8 digits	6
+Period	10 seconds to 300 seconds	30
