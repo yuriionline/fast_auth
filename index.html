@@ -3,1125 +3,505 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Fast Authenticator</title>
-  
-  <!-- SEO & Social Meta -->
-  <meta name="description" content="A radically simple, single-file client-side TOTP 2FA code generator. Complete privacy: keys never leave your browser.">
-  <meta property="og:title" content="Fast Authenticator">
-  <meta property="og:description" content="100% client-side, zero-login, secure and lightweight 2FA authenticator.">
+  <title>Fast Authenticator — Free Private 2FA &amp; TOTP Code Generator</title>
+
+  <!-- Primary SEO Meta -->
+  <meta name="description" content="Free, private 2FA code generator that runs 100% in your browser. Your TOTP keys never leave your device. Works offline, no signup, installable as an app.">
+  <meta name="keywords" content="2FA, two-factor authentication, TOTP, authenticator, OTP generator, one-time password, client-side authenticator, private 2FA, offline authenticator, PWA">
+  <meta name="author" content="Yurii">
+  <meta name="application-name" content="Fast Authenticator">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="googlebot" content="index, follow">
+  <link rel="canonical" href="https://2fa.fast/">
+
+  <!-- Open Graph (Facebook, LinkedIn, etc.) -->
   <meta property="og:type" content="website">
-  
+  <meta property="og:site_name" content="Fast Authenticator">
+  <meta property="og:title" content="Fast Authenticator — Free Private 2FA &amp; TOTP Code Generator">
+  <meta property="og:description" content="Generate two-factor authentication codes instantly in your browser. 100% client-side and private — your TOTP keys never leave your device. Free, offline-ready, no signup.">
+  <meta property="og:url" content="https://2fa.fast/">
+  <meta property="og:image" content="https://2fa.fast/icon.svg">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Fast Authenticator — Free Private 2FA &amp; TOTP Code Generator">
+  <meta name="twitter:description" content="Free, private 2FA code generator that runs 100% in your browser. Your TOTP keys never leave your device. Works offline, no signup.">
+  <meta name="twitter:image" content="https://2fa.fast/icon.svg">
+
+  <meta name="theme-color" content="#0c0d10">
+
+  <!-- Icons (static so crawlers see them without running JS) -->
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+
+  <!-- PWA Manifest (required for installability) -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Structured data: helps Google understand this is a free web app -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Fast Authenticator",
+    "url": "https://2fa.fast/",
+    "description": "Free, private 2FA code generator that runs 100% in your browser. Your TOTP keys never leave your device. Works offline, no signup, installable as an app.",
+    "applicationCategory": "SecurityApplication",
+    "operatingSystem": "Any (web browser)",
+    "browserRequirements": "Requires a modern web browser with JavaScript enabled",
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Client-side TOTP / 2FA code generation",
+      "QR code scanning and image upload",
+      "SHA-1, SHA-256, SHA-512 support",
+      "Offline PWA, installable",
+      "Encrypted-on-device, no servers or tracking"
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "Yurii"
+    }
+  }
+  </script>
+
   <!-- Apple Mobile Web App Settings -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Fast2FA">
-  
-  <!-- Stylesheet -->
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet — "Chronograph Vault", performance-tuned:
+       no backdrop-filter, no CSS filters, no will-change, no animated shadows. -->
+  <style>
     :root {
-      --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      
-      /* Dark Theme variables (default) */
-      --bg-primary: #07080d;
-      --bg-gradient: radial-gradient(circle at 50% 50%, #131026 0%, #07080d 100%);
-      --card-bg: rgba(16, 18, 30, 0.65);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --card-hover-border: rgba(99, 102, 241, 0.4);
-      --text-primary: #f8fafc;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      
-      --accent-primary: #6366f1; /* Indigo */
-      --accent-secondary: #a855f7; /* Purple */
-      --accent-cyan: #06b6d4; /* Cyan */
-      --accent-gradient: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-      
-      --color-success: #10b981;
-      --color-warning: #f59e0b;
-      --color-danger: #ef4444;
-      --color-shadow: rgba(0, 0, 0, 0.5);
-      --btn-bg: rgba(255, 255, 255, 0.06);
-      --btn-hover: rgba(255, 255, 255, 0.12);
-      
-      --ring-bg: rgba(255, 255, 255, 0.06);
-      --glass-blur: blur(20px);
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-display: 'Space Grotesk', var(--font-main);
+      --font-mono: 'JetBrains Mono', ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+      /* Dark (default) — graphite + champagne gold */
+      --bg-primary: #0c0d10;
+      --bg-elev: #131419;
+      --card-bg: #16181f;
+      --card-border: #262834;
+      --card-hover-border: #4a4636;
+      --text-primary: #f4f2ec;
+      --text-secondary: #9b9ba6;
+      --text-muted: #5d5e69;
+
+      --accent-primary: #e7bd6a;
+      --accent-secondary: #f3d79a;
+      --accent-cyan: #e7bd6a;            /* legacy hook */
+      --accent-gradient: linear-gradient(135deg, #f3d79a 0%, #d49d3f 100%);
+      --accent-soft: rgba(231, 189, 106, 0.12);
+      --on-accent: #241a06;
+
+      --color-success: #6fd3a3;
+      --color-warning: #f0a93d;
+      --color-danger:  #f0606b;
+
+      --btn-bg: #1c1e26;
+      --btn-hover: #232531;
+      --ring-bg: #262834;
+
+      --shadow-card: 0 10px 24px -20px rgba(0,0,0,0.85);
+      --shadow-pop: 0 24px 60px -30px rgba(0,0,0,0.85);
+      --r-lg: 20px; --r-md: 14px; --r-sm: 11px;
+      --glow-code: 0 0 22px rgba(231,189,106,0.20);
     }
 
     [data-theme="light"] {
-      --bg-primary: #f8fafc;
-      --bg-gradient: radial-gradient(circle at 50% 50%, #e2e8f0 0%, #f8fafc 100%);
-      --card-bg: rgba(255, 255, 255, 0.75);
-      --card-border: rgba(15, 23, 42, 0.06);
-      --card-hover-border: rgba(79, 70, 229, 0.3);
-      --text-primary: #0f172a;
-      --text-secondary: #475569;
-      --text-muted: #94a3b8;
-      
-      --accent-primary: #4f46e5;
-      --accent-secondary: #9333ea;
-      --accent-cyan: #0891b2;
-      --accent-gradient: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-      
-      --color-success: #059669;
-      --color-warning: #d97706;
-      --color-danger: #dc2626;
-      --color-shadow: rgba(15, 23, 42, 0.08);
-      --btn-bg: rgba(15, 23, 42, 0.05);
-      --btn-hover: rgba(15, 23, 42, 0.1);
-      
-      --ring-bg: rgba(15, 23, 42, 0.04);
+      --bg-primary: #f3f0e8;
+      --bg-elev: #fbf9f4;
+      --card-bg: #ffffff;
+      --card-border: #e7e1d2;
+      --card-hover-border: #d8be8e;
+      --text-primary: #1b1813;
+      --text-secondary: #5e584c;
+      --text-muted: #9b9485;
+
+      --accent-primary: #a9772a;
+      --accent-secondary: #c79a45;
+      --accent-cyan: #a9772a;
+      --accent-gradient: linear-gradient(135deg, #c79a45 0%, #9a6a1f 100%);
+      --accent-soft: rgba(169, 119, 42, 0.10);
+      --on-accent: #fdfbf6;
+
+      --color-success: #16916a;
+      --color-warning: #c47e16;
+      --color-danger:  #d23b46;
+
+      --btn-bg: #f0ebde;
+      --btn-hover: #e8e1d0;
+      --ring-bg: #e7e1d2;
+
+      --shadow-card: 0 10px 24px -20px rgba(60,50,30,0.4);
+      --shadow-pop: 0 24px 60px -32px rgba(60,50,30,0.4);
+      --glow-code: 0 0 20px rgba(169,119,42,0.12);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; }
 
     body {
       font-family: var(--font-main);
       background: var(--bg-primary);
-      background-image: var(--bg-gradient);
-      background-attachment: fixed;
       color: var(--text-primary);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      min-height: 100vh; min-height: 100dvh;
+      display: flex; flex-direction: column; align-items: center;
       padding: 0 16px;
-      overflow-x: hidden;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Core Container Layout */
-    .app-container {
-      width: 100%;
-      max-width: 540px;
-      margin: 32px 0 64px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
+    ::selection { background: var(--accent-soft); color: var(--text-primary); }
+    :focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; border-radius: 6px; }
 
-    @media (max-width: 600px) {
-      .app-container {
-        margin: 16px 0 48px 0;
-        gap: 16px;
-      }
-    }
+    .app-container { width: 100%; max-width: 540px; margin: 26px 0 72px; display: flex; flex-direction: column; gap: 18px; }
+    @media (max-width: 600px) { .app-container { margin: 14px 0 52px; gap: 14px; } }
 
-    /* Premium Header */
+    /* ---------------- Header ---------------- */
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      padding: 16px 20px;
-      background: var(--card-bg);
+      position: sticky; top: 10px; z-index: 50;
+      display: flex; justify-content: space-between; align-items: center;
+      width: 100%; padding: 14px 16px; gap: 12px;
+      background: linear-gradient(180deg, var(--bg-elev), var(--card-bg));
       border: 1px solid var(--card-border);
-      border-radius: 20px;
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      box-shadow: 0 8px 32px var(--color-shadow);
-      z-index: 10;
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-card);
     }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: var(--text-primary);
-    }
-
+    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-primary); min-width: 0; }
     .brand-logo {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: var(--accent-gradient);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
-      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+      width: 42px; height: 42px; border-radius: 13px; flex-shrink: 0;
+      background: var(--accent-gradient); color: var(--on-accent);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 16px -8px rgba(231,189,106,0.5);
     }
+    .brand-logo svg { width: 21px; height: 21px; }
+    .brand-info { min-width: 0; line-height: 1.12; }
+    .brand-info h1 { font-family: var(--font-display); font-size: 1.12rem; font-weight: 700; letter-spacing: -0.4px; }
+    .brand-info span { display: block; font-size: 0.72rem; color: var(--text-muted); font-weight: 500; letter-spacing: 0.3px; margin-top: 2px; }
+    .mobile-text { display: none !important; }
+    .header-actions { display: flex; gap: 9px; align-items: center; }
 
-    .brand-info h1 {
-      font-size: 1.15rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #ffffff 0%, #a855f7 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    
-    [data-theme="light"] .brand-info h1 {
-      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .brand-info span {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      display: block;
-      font-weight: 500;
-    }
-
-    .mobile-text {
-      display: none;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    /* IconButton Style */
+    /* ---------------- Buttons ---------------- */
     .btn-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      border: 1px solid var(--card-border);
-      background: var(--btn-bg);
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
-      flex-shrink: 0;
-      will-change: transform, background-color, border-color;
+      width: 44px; height: 44px; border-radius: 12px;
+      border: 1px solid var(--card-border); background: var(--btn-bg); color: var(--text-secondary);
+      display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+      transition: background-color .13s, border-color .13s, color .13s, transform .1s;
     }
+    .btn-icon:hover { background: var(--btn-hover); border-color: var(--card-hover-border); color: var(--text-primary); }
+    .btn-icon:active { transform: scale(0.94); }
+    .btn-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-    .btn-icon:hover {
-      background: var(--btn-hover);
-      border-color: var(--card-hover-border);
-    }
-
-    .btn-icon:active {
-      transform: scale(0.95);
-    }
-
-    .btn-icon svg {
-      width: 20px;
-      height: 20px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      flex-shrink: 0;
-    }
-
-    /* Primary Accent Button */
     .btn-primary {
-      padding: 0 20px;
-      height: 44px;
-      border-radius: 12px;
-      border: none;
-      background: var(--accent-gradient);
-      color: #ffffff;
-      font-weight: 600;
-      font-size: 0.9rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
-      white-space: nowrap;
-      flex-shrink: 0;
-      will-change: transform, box-shadow;
+      height: 44px; padding: 0 18px; border-radius: 12px; border: none;
+      background: var(--accent-gradient); color: var(--on-accent);
+      font-family: var(--font-main); font-weight: 650; font-size: 0.9rem;
+      display: inline-flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      box-shadow: 0 8px 20px -12px rgba(231,189,106,0.6);
+      transition: filter .13s, transform .1s;
     }
+    .btn-primary:hover { filter: brightness(1.06); }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-primary svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 
-    .btn-primary:hover {
-      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-      filter: brightness(1.05);
-    }
-
-    .btn-primary:active {
-      transform: scale(0.97);
-    }
-
-    .btn-primary svg {
-      width: 18px;
-      height: 18px;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      flex-shrink: 0;
-    }
-
-    /* Secondary / Plain buttons */
     .btn-secondary {
-      padding: 0 20px;
-      height: 44px;
-      border-radius: 12px;
-      border: 1px solid var(--card-border);
-      background: var(--btn-bg);
-      color: var(--text-primary);
-      font-weight: 600;
-      font-size: 0.9rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
-      white-space: nowrap;
-      flex-shrink: 0;
-      will-change: transform, background-color, border-color;
+      height: 44px; padding: 0 18px; border-radius: 12px;
+      border: 1px solid var(--card-border); background: var(--btn-bg); color: var(--text-primary);
+      font-family: var(--font-main); font-weight: 600; font-size: 0.9rem;
+      display: inline-flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: background-color .13s, border-color .13s, transform .1s;
     }
+    .btn-secondary:hover { background: var(--btn-hover); border-color: var(--card-hover-border); }
+    .btn-secondary:active { transform: scale(0.97); }
+    .btn-secondary svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-    .btn-secondary:hover {
-      background: var(--btn-hover);
-      border-color: var(--card-hover-border);
+    /* ---------------- Notice ---------------- */
+    .notice {
+      background: linear-gradient(180deg, rgba(240,169,61,0.07), transparent);
+      border: 1px solid rgba(240,169,61,0.28); border-radius: var(--r-lg);
+      padding: 16px 18px; font-size: 0.85rem; line-height: 1.55; color: var(--text-secondary);
     }
+    .notice-title { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-weight: 700; color: var(--color-warning); font-family: var(--font-display); }
+    .notice-title svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .notice a { color: var(--accent-primary); font-weight: 700; text-decoration: underline; }
 
-    .btn-secondary:active {
-      transform: scale(0.97);
-    }
-
-    .btn-secondary svg {
-      width: 18px;
-      height: 18px;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      flex-shrink: 0;
-    }
-
-    /* Temporary Account Card / Banner */
+    /* ---------------- Temp banner ---------------- */
     .temp-banner {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
-      border: 1px solid rgba(99, 102, 241, 0.3);
-      box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
-      border-radius: 20px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      animation: slideDown 0.4s ease;
+      background: linear-gradient(180deg, var(--accent-soft), transparent), var(--card-bg);
+      border: 1px solid var(--accent-primary); border-radius: var(--r-lg);
+      padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: var(--shadow-card);
+      animation: slideDown .28s ease;
     }
+    .temp-banner-header { display: flex; align-items: center; gap: 8px; color: var(--accent-primary); font-family: var(--font-display); font-size: 0.76rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    .temp-banner-header svg { width: 16px; height: 16px; }
+    .temp-actions { display: flex; gap: 10px; }
+    .temp-actions button { flex: 1; justify-content: center; }
 
-    .temp-banner-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--accent-cyan);
-    }
-
-    .temp-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .temp-actions button {
-      flex: 1;
-    }
-
-    /* Search and Filter Panel */
-    .search-panel {
-      position: relative;
-      width: 100%;
-    }
-
+    /* ---------------- Search ---------------- */
+    .search-panel { position: relative; width: 100%; }
     .search-input {
-      width: 100%;
-      height: 48px;
-      border-radius: 16px;
-      border: 1px solid var(--card-border);
-      background: var(--card-bg);
-      color: var(--text-primary);
-      padding: 0 20px 0 46px;
-      font-family: var(--font-main);
-      font-size: 0.95rem;
-      font-weight: 500;
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      transition: all 0.25s ease;
-      box-shadow: 0 4px 20px var(--color-shadow);
+      width: 100%; height: 48px; border-radius: var(--r-md);
+      border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-primary);
+      padding: 0 58px 0 46px; font-family: var(--font-main); font-size: 0.95rem; font-weight: 500;
+      transition: border-color .15s, box-shadow .15s;
     }
+    .search-input::placeholder { color: var(--text-muted); }
+    .search-input:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); display: flex; pointer-events: none; }
+    .search-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+    .badge-count { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700; color: var(--accent-primary); background: var(--accent-soft); padding: 5px 9px; border-radius: 8px; min-width: 30px; text-align: center; }
 
-    .search-input:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2), 0 4px 20px var(--color-shadow);
-    }
+    /* ---------------- Account cards ---------------- */
+    .accounts-grid { display: flex; flex-direction: column; gap: 12px; }
 
-    .search-icon {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      pointer-events: none;
-    }
-
-    .search-icon svg {
-      width: 18px;
-      height: 18px;
-      stroke: currentColor;
-      stroke-width: 2;
-    }
-    
-    .badge-count {
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      background: var(--btn-bg);
-      padding: 4px 8px;
-      border-radius: 8px;
-    }
-
-    /* Accounts Grid */
-    .accounts-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    /* Interactive Account Card */
     .account-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 20px;
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      box-shadow: 0 8px 32px var(--color-shadow);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
-      position: relative;
-      overflow: hidden;
-      will-change: transform, border-color, box-shadow;
+      background: linear-gradient(180deg, var(--bg-elev), var(--card-bg));
+      border: 1px solid var(--card-border); border-radius: var(--r-lg);
+      padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      position: relative; box-shadow: var(--shadow-card);
+      transition: border-color .13s, transform .13s;
     }
+    .account-card:hover { border-color: var(--card-hover-border); transform: translateY(-2px); }
 
-    .account-card:hover {
-      border-color: var(--card-hover-border);
-      box-shadow: 0 12px 40px var(--color-shadow);
-    }
-
-    .account-card:active {
-      transform: scale(0.99);
-    }
-
-    .account-info {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex: 1;
-      min-width: 0;
-    }
-
+    .account-info { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
     .account-avatar {
-      width: 46px;
-      height: 46px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 1.2rem;
-      color: #ffffff;
-      flex-shrink: 0;
-      box-shadow: 0 4px 12px var(--color-shadow);
+      width: 46px; height: 46px; border-radius: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-weight: 700; font-size: 1.22rem;
+      color: var(--accent-primary); background: var(--accent-soft); border: 1px solid var(--card-border);
     }
+    .account-details { min-width: 0; }
+    .issuer-name { font-family: var(--font-display); font-weight: 600; font-size: 1.02rem; letter-spacing: -0.2px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .account-label { font-size: 0.79rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
 
-    .account-details {
-      min-width: 0;
-    }
-
-    .issuer-name {
-      font-weight: 700;
-      font-size: 1.05rem;
-      letter-spacing: -0.3px;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .account-label {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-top: 2px;
-    }
-
-    .code-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-shrink: 0;
-    }
-
+    .acc-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .code-block { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
     .pin-code {
-      font-family: monospace;
-      font-size: 1.8rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--accent-cyan);
-      cursor: pointer;
-      user-select: all;
-      transition: all 0.15s ease;
-      position: relative;
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 1.6rem; font-weight: 600; letter-spacing: 1px; line-height: 1.15;
+      color: var(--text-primary); cursor: pointer; user-select: all;
+      transition: color .13s, text-shadow .13s;
     }
+    .pin-code:hover { color: var(--accent-primary); text-shadow: var(--glow-code); }
+    .code-gap { display: inline-block; width: 0.32em; }
+    .pin-code.copied { color: var(--color-success) !important; font-size: 1.2rem !important; letter-spacing: 1.5px !important; text-shadow: none !important; }
+    .next-pin.copied { color: var(--color-success) !important; font-weight: 700; }
+    .next-row { font-size: 0.72rem; color: var(--text-muted); cursor: pointer; user-select: none; display: flex; align-items: center; gap: 5px; }
+    .next-row:hover .next-pin { color: var(--accent-primary); }
+    .next-pin { font-family: var(--font-mono); font-weight: 600; color: var(--text-secondary); transition: color .13s; font-variant-numeric: tabular-nums; }
 
-    .code-gap {
-      display: inline-block;
-      width: 0.25em;
-    }
-
-    .pin-code.copied {
-      color: var(--color-success) !important;
-      text-shadow: 0 0 8px rgba(16, 185, 129, 0.4) !important;
-      font-size: 1.4rem !important;
-      letter-spacing: 0 !important;
-    }
-
-    .next-pin.copied {
-      color: var(--color-success) !important;
-      font-weight: 700;
-    }
-
-    /* Circular Countdown Ring */
-    .timer-container {
-      position: relative;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .progress-ring {
-      transform: rotate(-90deg);
-      width: 36px;
-      height: 36px;
-      will-change: transform;
-    }
-
-    .progress-ring-bg {
-      stroke: var(--ring-bg);
-    }
-
+    /* circular countdown ring — signature (no filter; cheap to repaint) */
+    .timer-container { position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .progress-ring { transform: rotate(-90deg); width: 38px; height: 38px; }
+    .progress-ring-bg { stroke: var(--ring-bg); }
     .progress-ring-fg {
-      stroke-dasharray: 88;
-      stroke-dashoffset: 0;
-      stroke-linecap: round;
-      transition: stroke-dashoffset 1.05s linear, stroke 0.3s ease;
-      will-change: stroke-dashoffset, stroke;
+      stroke: var(--color-success); stroke-dasharray: 88; stroke-dashoffset: 0; stroke-linecap: round;
+      transition: stroke-dashoffset 1s linear, stroke .3s ease;
     }
+    .progress-timer-text { position: absolute; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 
-    .progress-timer-text {
-      position: absolute;
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--text-secondary);
-    }
+    .card-actions { display: flex; gap: 6px; }
+    .card-actions .btn-icon { width: 34px; height: 34px; border-radius: 9px; }
+    .card-actions .btn-icon svg { width: 16px; height: 16px; }
+    .action-delete { color: var(--color-danger); }
+    .action-delete:hover { background: rgba(240,96,107,0.12); border-color: rgba(240,96,107,0.4); color: var(--color-danger); }
 
-    .card-actions {
-      display: flex;
-      gap: 6px;
-    }
+    /* feature card (instant + url temp) */
+    .account-card--feature { flex-direction: column; align-items: stretch; padding: 24px 22px; gap: 16px; }
+    .account-card--feature:hover { transform: none; }
+    .feature-code { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .pin-code--xl { font-size: 2.7rem; letter-spacing: 4px; color: var(--accent-primary); text-shadow: var(--glow-code); font-weight: 700; line-height: 1.1; }
+    .pin-code--xl:hover { color: var(--accent-secondary); }
+    .next-pin--feature { font-family: var(--font-mono); font-size: 1.15rem; color: var(--text-muted); font-weight: 600; letter-spacing: 2px; cursor: pointer; }
+    .meter { display: flex; align-items: center; gap: 12px; width: 100%; }
+    .meter-track { flex: 1; height: 6px; background: var(--ring-bg); border-radius: 10px; overflow: hidden; }
+    .progress-bar-fill { width: 0%; height: 100%; background: var(--accent-gradient); border-radius: 10px; transition: width .3s ease, background-color .3s ease; }
+    .progress-timer-text-bar { font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); min-width: 30px; text-align: right; }
+    .feature-secret { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); text-align: center; word-break: break-all; line-height: 1.5; border-top: 1px solid var(--card-border); padding-top: 12px; }
 
-    /* Empty State View */
+    /* ---------------- Empty state ---------------- */
     .empty-state {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 48px 24px;
-      text-align: center;
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      box-shadow: 0 8px 32px var(--color-shadow);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
+      background: linear-gradient(180deg, var(--bg-elev), var(--card-bg));
+      border: 1px solid var(--card-border); border-radius: var(--r-lg);
+      padding: 40px 26px; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 16px; box-shadow: var(--shadow-card);
     }
+    .empty-illustration { width: 78px; height: 78px; border-radius: 20px; background: var(--accent-soft); border: 1px solid var(--card-border); display: flex; align-items: center; justify-content: center; color: var(--accent-primary); margin-bottom: 4px; }
+    .empty-illustration svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+    .empty-state h2 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; }
+    .empty-state p { font-size: 0.9rem; color: var(--text-secondary); max-width: 340px; line-height: 1.55; }
+    .instant-field { width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+    .divider-or { display: flex; align-items: center; width: 100%; max-width: 340px; margin: 6px 0; }
+    .divider-or hr { flex: 1; border: 0; border-top: 1px solid var(--card-border); }
+    .divider-or span { padding: 0 14px; font-size: 0.7rem; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; }
+    .empty-state-buttons { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 340px; }
+    .empty-state-buttons button { width: 100%; justify-content: center; }
 
-    .empty-footer-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 20px;
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      box-shadow: 0 8px 32px var(--color-shadow);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+    .empty-footer-card { display: flex; flex-direction: column; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--r-lg); padding: 18px; box-shadow: var(--shadow-card); }
+    .empty-footer-card .ef-title { font-family: var(--font-display); font-weight: 700; color: var(--accent-primary); display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; }
+    .empty-footer-card .ef-title svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .empty-footer-card p { font-size: 0.85rem; line-height: 1.55; color: var(--text-secondary); }
+    .empty-footer-card code { display: block; font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-primary); margin-top: 10px; background: var(--bg-primary); padding: 9px 12px; border-radius: 9px; word-break: break-all; border: 1px solid var(--card-border); font-weight: 600; }
 
-    .empty-illustration {
-      width: 80px;
-      height: 80px;
-      border-radius: 24px;
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
-      border: 1px solid rgba(99, 102, 241, 0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent-primary);
-      margin-bottom: 8px;
-      box-shadow: inset 0 0 16px rgba(99, 102, 241, 0.05);
-    }
-
-    .empty-illustration svg {
-      width: 36px;
-      height: 36px;
-      stroke: currentColor;
-      stroke-width: 2;
-    }
-
-    .empty-state h2 {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .empty-state p {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      max-width: 320px;
-      line-height: 1.5;
-    }
-
-    .empty-state-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: 100%;
-      max-width: 320px;
-      margin-top: 10px;
-    }
-    
-    .empty-state-buttons button {
-      width: 100%;
-      justify-content: center;
-    }
-
-    /* Modal System: Overlay Popup Windows */
+    /* ---------------- Modals ---------------- */
     .modal-backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(5, 6, 10, 0.7);
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.15s linear, visibility 0.15s linear;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh;
+      background: rgba(6,7,10,0.66); z-index: 1000;
+      opacity: 0; visibility: hidden; transition: opacity .15s, visibility .15s;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
     }
-
-    .modal-backdrop.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
+    .modal-backdrop.active { opacity: 1; visibility: visible; }
     .modal-window {
-      width: 100%;
-      max-width: 480px;
-      background: linear-gradient(145deg, #12131a, #090a0f);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 24px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(99, 102, 241, 0.1);
-      transform: scale(0.95) translateY(10px);
-      opacity: 0;
-      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease;
-      display: flex;
-      flex-direction: column;
-      max-height: 90vh;
-      will-change: transform, opacity;
+      width: 100%; max-width: 480px; background: linear-gradient(180deg, var(--bg-elev), var(--card-bg));
+      border: 1px solid var(--card-border); border-radius: 24px;
+      transform: translateY(12px) scale(0.97); opacity: 0;
+      transition: transform .19s cubic-bezier(.34,1.35,.5,1), opacity .15s;
+      display: flex; flex-direction: column; max-height: 90vh; box-shadow: var(--shadow-pop);
     }
-
-    [data-theme="light"] .modal-window {
-      background: linear-gradient(145deg, #ffffff, #f1f5f9);
-      border: 1px solid rgba(15, 23, 42, 0.08);
-      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12), 0 0 30px rgba(99, 102, 241, 0.04);
-    }
-
-    .modal-backdrop.active .modal-window {
-      transform: scale(1) translateY(0);
-      opacity: 1;
-    }
-
-    .modal-header {
-      padding: 20px 24px 12px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .modal-header h3 {
-      font-size: 1.15rem;
-      font-weight: 700;
-    }
-
-    .modal-body {
-      padding: 0 24px 24px 24px;
-      overflow-y: auto;
-      max-height: calc(90vh - 100px);
-    }
-
-    .modal-footer-info {
-      padding: 16px 24px;
-      background: rgba(255, 255, 255, 0.02);
-      border-top: 1px solid var(--card-border);
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      flex-shrink: 0;
-    }
-
-    [data-theme="light"] .modal-footer-info {
-      background: rgba(15, 23, 42, 0.02);
-    }
+    .modal-backdrop.active .modal-window { transform: translateY(0) scale(1); opacity: 1; }
+    .modal-header { padding: 20px 22px 12px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .modal-header h3 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; letter-spacing: -0.3px; }
+    .modal-body { padding: 0 22px 22px; overflow-y: auto; }
+    body.modal-open { overflow: hidden; }
 
     @media (max-width: 600px) {
-      .modal-backdrop {
-        align-items: flex-start;
-        padding: 16px;
-        padding-top: 24px;
-      }
-
+      .modal-backdrop { align-items: flex-end; padding: 0; }
       .modal-window {
-        max-width: 100%;
-        border-radius: 24px;
-        transform: scale(0.95) translateY(-10px);
-        transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease;
-        max-height: 85vh;
+        max-width: 100%; border-radius: 24px 24px 0 0; max-height: 92vh; opacity: 1;
+        transform: translateY(100%); transition: transform .25s cubic-bezier(.32,.72,0,1);
       }
-
-      .modal-backdrop.active .modal-window {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-      }
-
-      .header-actions .btn-primary span {
-        display: none;
-      }
-      
-      .header-actions .btn-primary {
-        padding: 0;
-        width: 44px;
-        justify-content: center;
-      }
-
-      .desktop-text {
-        display: none !important;
-      }
-      
-      .mobile-text {
-        display: block !important;
-      }
+      .modal-backdrop.active .modal-window { transform: translateY(0); }
+      .header-actions .btn-primary span { display: none; }
+      .header-actions .btn-primary { width: 44px; padding: 0; justify-content: center; }
+      .desktop-text { display: none !important; }
+      .mobile-text { display: block !important; }
+      header { top: 6px; }
+      .pin-code { font-size: 1.4rem; }
+      .account-card { padding: 14px 15px; }
     }
 
-    body.modal-open {
-      overflow: hidden;
-    }
+    /* tabs */
+    .tab-bar { display: flex; gap: 3px; padding: 4px; background: var(--bg-primary); border: 1px solid var(--card-border); border-radius: var(--r-md); margin-bottom: 18px; }
+    .tab-btn { flex: 1; height: 38px; border: none; border-radius: 9px; background: transparent; color: var(--text-secondary); font-family: var(--font-main); font-weight: 600; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background-color .13s, color .13s; }
+    .tab-btn:hover { color: var(--text-primary); }
+    .tab-btn.active { background: var(--accent-gradient); color: var(--on-accent); }
+    .tab-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; }
+    @media (max-width: 460px) { .tab-btn { flex-direction: column; gap: 3px; font-size: 0.66rem; height: 46px; } }
+    .tab-content { display: none; }
+    .tab-content.active { display: flex; flex-direction: column; gap: 16px; }
 
-    /* Modal Navigation Tabs */
-    .tab-bar {
-      display: flex;
-      background: var(--btn-bg);
-      padding: 4px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      gap: 4px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      height: 36px;
-      border-radius: 8px;
-      border: none;
-      background: transparent;
-      color: var(--text-secondary);
-      font-family: var(--font-main);
-      font-weight: 600;
-      font-size: 0.8rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-    }
-
-    .tab-btn.active {
-      background: var(--card-bg);
-      color: var(--text-primary);
-      box-shadow: 0 2px 8px var(--color-shadow);
-    }
-
-    .tab-btn svg {
-      width: 16px;
-      height: 16px;
-      stroke: currentColor;
-      stroke-width: 2;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    /* Form Fields */
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .form-group label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-    }
-
-    .form-control {
-      width: 100%;
-      height: 44px;
-      border-radius: 12px;
-      border: 1px solid var(--card-border);
-      background: var(--btn-bg);
-      color: var(--text-primary);
-      padding: 0 16px;
-      font-family: var(--font-main);
-      font-size: 0.9rem;
-      font-weight: 500;
-      transition: all 0.2s ease;
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-      background: rgba(99, 102, 241, 0.03);
-    }
-    
+    /* forms */
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-group label { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); }
+    .form-control { width: 100%; height: 46px; border-radius: var(--r-sm); border: 1px solid var(--card-border); background: var(--bg-primary); color: var(--text-primary); padding: 0 15px; font-family: var(--font-main); font-size: 0.92rem; font-weight: 500; transition: border-color .15s, box-shadow .15s; }
+    .form-control::placeholder { color: var(--text-muted); }
+    .form-control:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--accent-soft); }
+    textarea.form-control { font-family: var(--font-mono); }
     select.form-control {
       appearance: none;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      background-size: 16px;
-      padding-right: 40px;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%239b9ba6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+      background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px;
     }
+    .accordion-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; padding: 6px 0; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-muted); transition: color .15s; }
+    .accordion-header:hover { color: var(--text-secondary); }
+    .accordion-header svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; transition: transform .22s; }
+    .accordion-header.active svg { transform: rotate(180deg); }
+    .accordion-body { display: none; flex-direction: column; gap: 16px; padding-top: 6px; }
+    .accordion-body.active { display: flex; }
 
-    /* Advanced Config (Accordion) */
-    .accordion-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      cursor: pointer;
-      padding: 8px 0;
-      user-select: none;
-      transition: color 0.2s ease;
-    }
+    .drag-drop-zone { border: 2px dashed var(--card-border); border-radius: var(--r-md); background: var(--bg-primary); padding: 32px 16px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 12px; transition: border-color .2s, background-color .2s; }
+    .drag-drop-zone:hover { border-color: var(--card-hover-border); }
+    .drag-drop-zone.dragover { border-color: var(--accent-primary); background: var(--accent-soft); }
+    .drag-drop-zone svg { width: 40px; height: 40px; fill: none; stroke: var(--accent-primary); stroke-width: 1.5; }
+    .drag-drop-zone p { font-size: 0.86rem; font-weight: 600; color: var(--text-primary); }
+    .drag-drop-zone span { font-size: 0.74rem; color: var(--text-muted); }
 
-    .accordion-header:hover {
-      color: var(--text-secondary);
-    }
+    .webcam-container { width: 100%; aspect-ratio: 4/3; border-radius: var(--r-md); overflow: hidden; background: #000; border: 1px solid var(--card-border); display: flex; align-items: center; justify-content: center; }
+    #webcam-preview { width: 100%; height: 100%; position: relative; }
+    #webcam-preview video { width: 100% !important; height: 100% !important; object-fit: cover; display: block; }
+    .placeholder-msg { color: var(--text-muted); font-size: 0.86rem; }
+    .error-msg { color: var(--color-danger); font-size: 0.86rem; font-weight: 600; padding: 16px; text-align: center; }
 
-    .accordion-header svg {
-      width: 16px;
-      height: 16px;
-      transition: transform 0.25s ease;
-      stroke: currentColor;
-      stroke-width: 2;
-    }
+    .status-msg { display: none; font-size: 0.8rem; font-weight: 600; padding: 9px 12px; border-radius: 9px; text-align: center; }
+    .status-msg.loading { display: block; background: var(--accent-soft); color: var(--accent-primary); }
+    .status-msg.success { display: block; background: rgba(111,211,163,0.13); color: var(--color-success); }
+    .status-msg.error { display: block; background: rgba(240,96,107,0.13); color: var(--color-danger); }
 
-    .accordion-header.active svg {
-      transform: rotate(180deg);
-    }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .hint-text { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; }
+    hr.sep { border: 0; border-top: 1px solid var(--card-border); }
+    .danger-btn { color: var(--color-danger); border-color: rgba(240,96,107,0.28); background: rgba(240,96,107,0.06); }
+    .danger-btn:hover { background: rgba(240,96,107,0.12); border-color: rgba(240,96,107,0.5); }
+    .privacy-list { font-size: 0.82rem; line-height: 1.55; color: var(--text-secondary); display: flex; flex-direction: column; gap: 9px; }
+    .privacy-list strong { color: var(--text-primary); }
 
-    .accordion-body {
-      display: none;
-      flex-direction: column;
-      gap: 16px;
-      padding-top: 8px;
-    }
-
-    .accordion-body.active {
-      display: flex;
-    }
-
-    /* Drag & Drop File Zone */
-    .drag-drop-zone {
-      border: 2px dashed var(--card-border);
-      border-radius: 16px;
-      padding: 32px 16px;
-      text-align: center;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      background: var(--btn-bg);
-      transition: all 0.25s ease;
-    }
-
-    .drag-drop-zone.dragover {
-      border-color: var(--accent-primary);
-      background: rgba(99, 102, 241, 0.05);
-      box-shadow: inset 0 0 12px rgba(99, 102, 241, 0.1);
-    }
-
-    .drag-drop-zone svg {
-      width: 40px;
-      height: 40px;
-      color: var(--text-muted);
-      stroke: currentColor;
-      stroke-width: 1.5;
-    }
-
-    .drag-drop-zone p {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-
-    .drag-drop-zone span {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    /* Webcam Container */
-    .webcam-container {
-      width: 100%;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #000000;
-      position: relative;
-      aspect-ratio: 4/3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--card-border);
-    }
-
-    #webcam-preview {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    .placeholder-msg {
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-
-    .error-msg {
-      color: var(--color-danger);
-      font-size: 0.85rem;
-      font-weight: 600;
-      padding: 16px;
-      text-align: center;
-    }
-
-    .status-msg {
-      font-size: 0.8rem;
-      font-weight: 600;
-      padding: 8px 12px;
-      border-radius: 8px;
-      text-align: center;
-      display: none;
-    }
-
-    .status-msg.loading {
-      display: block;
-      background: rgba(99, 102, 241, 0.1);
-      color: var(--accent-primary);
-    }
-
-    .status-msg.success {
-      display: block;
-      background: rgba(16, 185, 129, 0.1);
-      color: var(--color-success);
-    }
-
-    .status-msg.error {
-      display: block;
-      background: rgba(239, 68, 68, 0.1);
-      color: var(--color-danger);
-    }
-
-    .modal-footer {
-      padding: 20px 24px;
-      border-top: 1px solid var(--card-border);
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-    }
-
-    /* Toast Notification */
-    .toast-container {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #ffffff;
-      padding: 12px 20px;
-      border-radius: 14px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(10px);
-      font-size: 0.85rem;
-      font-weight: 600;
-      pointer-events: none;
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    
-    .toast-container.active {
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .toast-icon {
-      width: 18px;
-      height: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .toast-icon svg {
-      width: 100%;
-      height: 100%;
-      stroke-width: 2.5;
-    }
-
+    /* toast */
+    .toast-container { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(130px); z-index: 2000; display: flex; align-items: center; gap: 10px; background: var(--bg-elev); border: 1px solid var(--card-border); color: var(--text-primary); padding: 12px 18px; border-radius: 14px; font-size: 0.86rem; font-weight: 600; pointer-events: none; box-shadow: var(--shadow-pop); transition: transform .3s cubic-bezier(.18,.89,.32,1.28); }
+    .toast-container.active { transform: translateX(-50%) translateY(0); }
+    .toast-icon { width: 19px; height: 19px; display: flex; }
+    .toast-icon svg { width: 100%; height: 100%; fill: none; stroke-width: 2.5; }
     .toast-success .toast-icon { color: var(--color-success); }
     .toast-error .toast-icon { color: var(--color-danger); }
-    .toast-info .toast-icon { color: var(--accent-cyan); }
+    .toast-info .toast-icon { color: var(--accent-primary); }
 
-    /* Footer Info */
-    footer {
-      text-align: center;
-      padding: 32px 0;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      width: 100%;
-    }
+    footer { text-align: center; padding: 28px 0; font-size: 0.74rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px; }
+    footer a { color: var(--text-secondary); text-decoration: none; font-weight: 600; }
+    footer a:hover { color: var(--accent-primary); }
 
-    footer a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-weight: 600;
-      transition: color 0.2s ease;
-    }
-
-    footer a:hover {
-      color: var(--accent-primary);
-    }
-
-    /* Animations */
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
   </style>
 </head>
 <body>
 
   <div class="app-container">
-    
-    <!-- Secure Context Warning (Web Crypto Check) -->
-    <div id="crypto-warning" style="display: none; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 20px; padding: 16px 20px; font-size: 0.85rem; line-height: 1.5; color: var(--text-secondary); margin-bottom: 4px; box-shadow: 0 4px 16px var(--color-shadow);">
-      <div style="font-weight: 700; color: var(--color-warning); display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 18px; height: 18px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-        <span>JS Cryptographic Engine Active (Insecure Context)</span>
+
+    <!-- Secure Context Warning -->
+    <div id="crypto-warning" class="notice" style="display: none;">
+      <div class="notice-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <span>JS crypto engine active (insecure context)</span>
       </div>
-      This browser context does not support the native Web Crypto API. Fast Authenticator has automatically activated a secure, client-side JS fallback engine to generate your codes. For maximum security, we recommend loading this app over <a href="https://2fa.fast" target="_blank" style="color: var(--accent-cyan); font-weight: 700; text-decoration: underline;">https://2fa.fast</a> or running it on a secure local context (localhost).
+      This context has no native Web Crypto API, so a client-side JS fallback engine is generating your codes. For maximum security, load this app over <a href="https://2fa.fast" target="_blank">https://2fa.fast</a> or a secure local context (localhost).
     </div>
 
     <!-- Header -->
     <header>
       <a href="#" class="brand">
         <div class="brand-logo">
-          <!-- Lock Icon -->
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="10" width="16" height="11" rx="2.5"></rect>
+            <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+            <circle cx="12" cy="15.5" r="1.4" fill="currentColor" stroke="none"></circle>
           </svg>
         </div>
         <div class="brand-info">
           <h1 class="desktop-text">Fast Authenticator</h1>
-          <h1 class="mobile-text">Fast Auth</h1>
-          <span class="desktop-text">100% Client-Side 2FA</span>
-          <span class="mobile-text">Client-Side 2FA</span>
+          <h1 class="mobile-text">2FA</h1>
+          <span class="desktop-text">100% client-side · no servers</span>
         </div>
       </a>
-      
       <div class="header-actions">
-        <!-- PWA Install Button (hidden by default) -->
-        <button class="btn-icon" id="pwa-install-btn" style="display: none;" onclick="installPWA()" title="Install as App">
+        <button class="btn-icon" id="pwa-install-btn" style="display: none;" onclick="installPWA()" title="Install as app">
           <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
         </button>
-        <!-- Light/Dark Toggle -->
-        <button class="btn-icon" onclick="toggleTheme()" id="theme-toggle-btn" title="Toggle Theme">
+        <button class="btn-icon" onclick="toggleTheme()" id="theme-toggle-btn" title="Toggle theme">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
         </button>
-        <!-- Backup & Settings -->
-        <button class="btn-icon" onclick="openModal('settings-modal')" title="Backup & Restore">
-          <svg viewBox="0 0 24 24">
-            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
-            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
-            <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path>
-          </svg>
+        <button class="btn-icon" onclick="openModal('settings-modal')" title="Backup &amp; restore">
+          <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path></svg>
         </button>
-        <!-- Add Account -->
         <button class="btn-primary" onclick="openModal('add-modal')">
           <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           <span>Add</span>
@@ -1129,27 +509,22 @@
       </div>
     </header>
 
-
-
-    <!-- Active URL-loaded Temporary Account -->
+    <!-- URL-loaded temporary account -->
     <div id="url-account-section" style="display: none;">
       <div class="temp-banner">
         <div class="temp-banner-header">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-          <span>Active Code via Secret Link</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.6 13.4a2 2 0 0 1 0-2.8l3.2-3.2a2 2 0 1 1 2.8 2.8l-1 1"></path><path d="M13.4 10.6a2 2 0 0 1 0 2.8l-3.2 3.2a2 2 0 1 1-2.8-2.8l1-1"></path></svg>
+          <span>Code via secret link</span>
         </div>
-        
-        <!-- Live Card Rendered Dynamically -->
         <div id="temp-card-container"></div>
-        
         <div class="temp-actions">
-          <button class="btn-primary" onclick="saveTempAccount()">Save to this Device</button>
+          <button class="btn-primary" onclick="saveTempAccount()">Save to this device</button>
           <button class="btn-secondary" onclick="dismissTempAccount()">Dismiss</button>
         </div>
       </div>
     </div>
 
-    <!-- Search / Filter bar (Shown if accounts saved) -->
+    <!-- Search -->
     <div class="search-panel" id="search-panel" style="display: none;">
       <span class="search-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -1157,75 +532,69 @@
       <input type="text" id="search-bar" class="search-input" placeholder="Search accounts..." oninput="filterAccounts()">
       <span class="badge-count" id="accounts-badge">0</span>
     </div>
-    <!-- Active Accounts List -->
+
+    <!-- Accounts list -->
     <div class="accounts-grid" id="accounts-grid"></div>
 
-    <!-- Empty State View -->
+    <!-- Empty state / hero -->
     <div class="empty-state" id="empty-state">
       <div class="empty-illustration" id="empty-illustration">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
       </div>
-      <h2 id="empty-title">No Saved Accounts Found</h2>
-      <p>Paste a secret key to generate a code instantly, or choose a manager option below.</p>
-      
-      <!-- Instant Code Input -->
-      <div style="width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
-        <input type="text" id="empty-instant-secret" class="form-control" placeholder="Paste Secret Key (Base32)" style="text-align: center; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">
+      <h2 id="empty-title">Your vault is empty</h2>
+      <p>Paste a secret key for an instant code, or pick a way to add an account below.</p>
+
+      <div class="instant-field">
+        <input type="text" id="empty-instant-secret" class="form-control" placeholder="Paste secret key (Base32)" style="text-align: center; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">
         <span id="instant-error" style="color: var(--color-danger); font-size: 0.75rem; font-weight: 600; display: none;">Invalid Base32 secret key</span>
-        <div id="instant-preview-container" style="width: 100%;"></div>
+        <div id="instant-preview-container"></div>
       </div>
-      <div style="display: flex; align-items: center; width: 100%; max-width: 320px; margin: 10px 0;">
-        <hr style="flex: 1; border: 0; border-top: 1px solid var(--card-border);">
-        <span style="padding: 0 12px; font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">OR</span>
-        <hr style="flex: 1; border: 0; border-top: 1px solid var(--card-border);">
-      </div>
+
+      <div class="divider-or"><hr><span>OR</span><hr></div>
 
       <div class="empty-state-buttons">
         <button class="btn-primary" onclick="openModal('add-modal'); switchTab('camera');">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-          Scan QR Code
+          Scan QR code
         </button>
         <button class="btn-secondary" onclick="openModal('add-modal'); switchTab('file');">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-          Upload QR Image
+          Upload QR image
         </button>
         <button class="btn-secondary" onclick="openModal('add-modal'); switchTab('manual');">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
-          Enter Key Manually
+          Enter key manually
         </button>
         <button class="btn-secondary" onclick="openModal('add-modal'); switchTab('bulk');">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-          Add List of Codes
+          Add list of keys
         </button>
       </div>
     </div>
 
-    <!-- Empty State Footer Card -->
+    <!-- Empty footer card -->
     <div class="empty-footer-card" id="empty-footer-card" style="display: none;">
-      <div style="font-weight: 700; color: var(--accent-cyan); display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 16px; height: 16px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-        <span>Quick URL Access (GET)</span>
+      <div class="ef-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <span>Quick URL access</span>
       </div>
-      <p style="font-size: 0.85rem; line-height: 1.5; color: var(--text-secondary);">
-        You can instantly load, generate, and auto-copy a 2FA code without manual entry. Just append the secret key to the URL as a path or query variable:
-      </p>
-      <code style="display: block; font-family: monospace; font-size: 0.8rem; color: var(--accent-secondary); margin-top: 8px; background: var(--btn-bg); padding: 6px 12px; border-radius: 8px; word-break: break-all; border: 1px solid var(--card-border); font-weight: 600;">https://2fa.fast/?YOUR_SECRET_KEY</code>
+      <p>Load, generate, and auto-copy a 2FA code with no manual entry. Just append the secret key straight to the domain:</p>
+      <code>https://2fa.fast/YOUR_SECRET_KEY</code>
     </div>
   </div>
 
-  <!-- Add Account Modal Backdrop -->
+  <!-- Add Account Modal -->
   <div class="modal-backdrop" id="add-modal" onclick="if(event.target === this) closeModal('add-modal')">
     <div class="modal-window">
       <div class="modal-header">
-        <h3 style="font-size: 1.15rem; font-weight: 700;">Add 2FA Account</h3>
-        <button class="btn-icon" onclick="closeModal('add-modal')" style="width: 32px; height: 32px; border-radius: 8px;" title="Close">
-          <svg viewBox="0 0 24 24" style="width:16px; height:16px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <h3>Add 2FA account</h3>
+        <button class="btn-icon" onclick="closeModal('add-modal')" style="width: 34px; height: 34px; border-radius: 9px;" title="Close">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
       <div class="modal-body">
-        <!-- Tabs -->
-        <div class="tab-bar" style="margin-bottom: 16px;">
-          <button class="tab-btn active" id="tab-camera" onclick="switchTab('camera')">
+        <div class="tab-bar">
+          <button class="tab-btn" id="tab-camera" onclick="switchTab('camera')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
             Webcam
           </button>
@@ -1233,7 +602,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
             Upload
           </button>
-          <button class="tab-btn" id="tab-manual" onclick="switchTab('manual')">
+          <button class="tab-btn active" id="tab-manual" onclick="switchTab('manual')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             Manual
           </button>
@@ -1243,181 +612,158 @@
           </button>
         </div>
 
-        <!-- Camera Scanner Tab -->
-        <div class="tab-content active" id="content-camera">
-          <div class="webcam-container" style="margin-bottom: 16px;">
-            <div id="webcam-preview">
-              <div class="placeholder-msg">Start camera to begin scanning</div>
-            </div>
+        <div class="tab-content" id="content-camera">
+          <div class="webcam-container">
+            <div id="webcam-preview"><div class="placeholder-msg">Start camera to begin scanning</div></div>
           </div>
           <div style="display: flex; gap: 10px;">
-            <button class="btn-primary" style="flex: 1; justify-content: center;" onclick="startWebcamScanner()">Start Camera</button>
+            <button class="btn-primary" style="flex: 1; justify-content: center;" onclick="startWebcamScanner()">Start camera</button>
             <button class="btn-secondary" style="display: none; justify-content: center;" id="stop-webcam-btn" onclick="stopWebcamScanner()">Stop</button>
           </div>
         </div>
 
-        <!-- File Upload Tab -->
         <div class="tab-content" id="content-file">
-          <div class="drag-drop-zone" id="drag-drop-zone" style="margin-bottom: 16px;">
+          <div class="drag-drop-zone" id="drag-drop-zone">
             <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-            <p>Drag & drop QR image here, or click to browse</p>
+            <p>Drag &amp; drop a QR image here, or click to browse</p>
             <span>Supports PNG, JPG, JPEG</span>
             <input type="file" id="qr-file-input" style="display: none;" accept="image/*">
           </div>
           <div class="status-msg" id="file-upload-status"></div>
         </div>
 
-        <!-- Manual Form Tab -->
-        <div class="tab-content" id="content-manual">
-          <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="tab-content active" id="content-manual">
+          <div class="form-group">
+            <label for="input-issuer">Issuer / provider <span style="font-weight: 400; opacity: 0.7;">(optional)</span></label>
+            <input type="text" id="input-issuer" class="form-control" placeholder="e.g. Google, GitHub, Discord">
+          </div>
+          <div class="form-group">
+            <label for="input-label">Account label <span style="font-weight: 400; opacity: 0.7;">(optional)</span></label>
+            <input type="text" id="input-label" class="form-control" placeholder="e.g. user@gmail.com">
+          </div>
+          <div class="form-group">
+            <label for="input-secret">Secret key (Base32)</label>
+            <input type="text" id="input-secret" class="form-control" placeholder="e.g. JBSWY3DPEHPK3PXP" required style="text-transform: uppercase;">
+          </div>
+          <div class="accordion-header" onclick="toggleAdvancedSettings()" id="advanced-toggle">
+            <span>Advanced config</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div class="accordion-body" id="advanced-body">
             <div class="form-group">
-              <label for="input-issuer">Issuer / Provider <span style="font-weight: 400; opacity: 0.7;">(Optional)</span></label>
-              <input type="text" id="input-issuer" class="form-control" placeholder="e.g. Google, GitHub, Discord">
+              <label for="input-algorithm">Algorithm</label>
+              <select id="input-algorithm" class="form-control">
+                <option value="SHA-1" selected>SHA-1 (Default)</option>
+                <option value="SHA-256">SHA-256</option>
+                <option value="SHA-512">SHA-512</option>
+              </select>
             </div>
             <div class="form-group">
-              <label for="input-label">Account Label <span style="font-weight: 400; opacity: 0.7;">(Optional)</span></label>
-              <input type="text" id="input-label" class="form-control" placeholder="e.g. user@gmail.com">
+              <label for="input-digits">Digits</label>
+              <select id="input-digits" class="form-control">
+                <option value="6" selected>6 digits</option>
+                <option value="8">8 digits</option>
+              </select>
             </div>
             <div class="form-group">
-              <label for="input-secret">Secret Key (Base32)</label>
-              <input type="text" id="input-secret" class="form-control" placeholder="e.g. JBSWY3DPEHPK3PXP" required style="text-transform: uppercase;">
-            </div>
-
-            <!-- Advanced Config Accordion -->
-            <div class="accordion-header" onclick="toggleAdvancedSettings()" id="advanced-toggle">
-              <span>Advanced Config</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </div>
-
-            <div class="accordion-body" id="advanced-body">
-              <div class="form-group">
-                <label for="input-algorithm">Algorithm</label>
-                <select id="input-algorithm" class="form-control">
-                  <option value="SHA-1" selected>SHA-1 (Default)</option>
-                  <option value="SHA-256">SHA-256</option>
-                  <option value="SHA-512">SHA-512</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="input-digits">Digits</label>
-                <select id="input-digits" class="form-control">
-                  <option value="6" selected>6 Digits</option>
-                  <option value="8">8 Digits</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="input-period">Period (Seconds)</label>
-                <input type="number" id="input-period" class="form-control" value="30" min="10" max="300">
-              </div>
+              <label for="input-period">Period (seconds)</label>
+              <input type="number" id="input-period" class="form-control" value="30" min="10" max="300">
             </div>
           </div>
         </div>
 
-        <!-- Bulk Form Tab -->
         <div class="tab-content" id="content-bulk">
-          <div style="display: flex; flex-direction: column; gap: 16px;">
-            <div class="form-group">
-              <label for="input-bulk">Secret Keys (one per line)</label>
-              <textarea id="input-bulk" class="form-control" style="height: 140px; font-family: monospace; resize: vertical; padding: 12px; line-height: 1.5;" placeholder="JBSWY3DPEHPK3PXP&#10;KVKVE43VONYXE23K&#10;..."></textarea>
-            </div>
-            <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-top: -4px;">
-              💡 Paste multiple raw Base32 secret keys. Empty lines are skipped automatically.
-            </div>
+          <div class="form-group">
+            <label for="input-bulk">Secret keys (one per line)</label>
+            <textarea id="input-bulk" class="form-control" style="height: 150px; resize: vertical; padding: 12px 14px; line-height: 1.5;" placeholder="JBSWY3DPEHPK3PXP&#10;KVKVE43VONYXE23K&#10;..."></textarea>
           </div>
+          <div class="hint-text">Paste multiple raw Base32 secret keys. Empty lines are skipped automatically.</div>
         </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+        <div class="modal-actions">
           <button class="btn-secondary" onclick="closeModal('add-modal')">Cancel</button>
-          <button class="btn-primary" id="add-modal-save-btn" onclick="saveManualAccount()">Save Account</button>
+          <button class="btn-primary" id="add-modal-save-btn" onclick="saveManualAccount()">Save account</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Settings & Backup Modal Backdrop -->
+  <!-- Settings & Backup Modal -->
   <div class="modal-backdrop" id="settings-modal" onclick="if(event.target === this) closeModal('settings-modal')">
     <div class="modal-window">
       <div class="modal-header">
-        <h3 style="font-size: 1.15rem; font-weight: 700;">Backup & Settings</h3>
-        <button class="btn-icon" onclick="closeModal('settings-modal')" style="width: 32px; height: 32px; border-radius: 8px;" title="Close">
-          <svg viewBox="0 0 24 24" style="width:16px; height:16px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <h3>Backup &amp; settings</h3>
+        <button class="btn-icon" onclick="closeModal('settings-modal')" style="width: 34px; height: 34px; border-radius: 9px;" title="Close">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
       <div class="modal-body" style="display: flex; flex-direction: column; gap: 20px;">
         <div class="form-group">
-          <label>Data Portability</label>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px;">
+          <label>Data portability</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px;">
             <button class="btn-secondary" onclick="exportBackup()" style="justify-content: center;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
               Export JSON
             </button>
             <button class="btn-secondary" onclick="document.getElementById('import-file-input').click()" style="justify-content: center;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-              Import Backup
+              Import backup
             </button>
             <input type="file" id="import-file-input" style="display: none;" accept=".json" onchange="importBackup(event)">
           </div>
         </div>
-
-        <hr style="border: 0; border-top: 1px solid var(--card-border);">
-
+        <hr class="sep">
         <div class="form-group">
-          <label style="color: var(--color-danger)">Danger Zone</label>
-          <button class="btn-secondary" onclick="clearAllData()" style="justify-content: center; color: var(--color-danger); border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); margin-top: 6px;">
+          <label style="color: var(--color-danger)">Danger zone</label>
+          <button class="btn-secondary danger-btn" onclick="clearAllData()" style="justify-content: center; margin-top: 4px;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-            Clear All Device Data
+            Clear all device data
           </button>
         </div>
-
-        <hr style="border: 0; border-top: 1px solid var(--card-border);">
-
+        <hr class="sep">
         <div class="form-group">
-          <label>Security & Privacy Guarantees</label>
-          <div style="font-size: 0.8rem; line-height: 1.5; color: var(--text-secondary); display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
-            <p>🛡️ <strong>100% Local Engine:</strong> Cryptographic signatures are calculated directly inside your browser process using the native Web Crypto API. No data is ever transmitted to an external server.</p>
-            <p>💻 <strong>Host Anywhere:</strong> Fast Authenticator is client-only. You can download this single file and run it offline on your desktop by just opening it directly.</p>
-            <p>⚠️ <strong>Local Storage warning:</strong> Keys are stored unencrypted in browser localStorage. Ensure your device is password protected and do not save accounts on shared public profiles.</p>
+          <label>Security &amp; privacy</label>
+          <div class="privacy-list" style="margin-top: 4px;">
+            <p>🛡️ <strong>100% local engine.</strong> Signatures are computed inside your browser via the native Web Crypto API. Nothing is ever sent to a server.</p>
+            <p>💻 <strong>Host anywhere.</strong> Client-only — download this single file and run it offline by opening it.</p>
+            <p>⚠️ <strong>Local storage warning.</strong> Keys are stored unencrypted in localStorage. Keep your device password protected and avoid shared profiles.</p>
           </div>
         </div>
-
-        <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+        <div style="display: flex; justify-content: flex-end;">
           <button class="btn-primary" onclick="closeModal('settings-modal')">Done</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Edit Account Modal Backdrop -->
+  <!-- Edit Account Modal -->
   <div class="modal-backdrop" id="edit-modal" onclick="if(event.target === this) closeModal('edit-modal')">
     <div class="modal-window">
       <div class="modal-header">
-        <h3 style="font-size: 1.15rem; font-weight: 700;">Edit 2FA Account</h3>
-        <button class="btn-icon" onclick="closeModal('edit-modal')" style="width: 32px; height: 32px; border-radius: 8px;" title="Close">
-          <svg viewBox="0 0 24 24" style="width:16px; height:16px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <h3>Edit 2FA account</h3>
+        <button class="btn-icon" onclick="closeModal('edit-modal')" style="width: 34px; height: 34px; border-radius: 9px;" title="Close">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
       <div class="modal-body">
         <input type="hidden" id="edit-account-id">
         <div style="display: flex; flex-direction: column; gap: 16px;">
           <div class="form-group">
-            <label for="edit-issuer">Issuer / Provider <span style="font-weight: 400; opacity: 0.7;">(Optional)</span></label>
+            <label for="edit-issuer">Issuer / provider <span style="font-weight: 400; opacity: 0.7;">(optional)</span></label>
             <input type="text" id="edit-issuer" class="form-control" placeholder="e.g. Google, GitHub, Discord">
           </div>
           <div class="form-group">
-            <label for="edit-label">Account Label <span style="font-weight: 400; opacity: 0.7;">(Optional)</span></label>
+            <label for="edit-label">Account label <span style="font-weight: 400; opacity: 0.7;">(optional)</span></label>
             <input type="text" id="edit-label" class="form-control" placeholder="e.g. user@gmail.com">
           </div>
           <div class="form-group">
-            <label for="edit-secret">Secret Key (Base32)</label>
+            <label for="edit-secret">Secret key (Base32)</label>
             <input type="text" id="edit-secret" class="form-control" placeholder="e.g. JBSWY3DPEHPK3PXP" required style="text-transform: uppercase;">
           </div>
-
-          <!-- Edit Advanced Config Accordion -->
           <div class="accordion-header" onclick="toggleEditAdvancedSettings()" id="edit-advanced-toggle">
-            <span>Advanced Config</span>
+            <span>Advanced config</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="6 9 12 15 18 9"></polyline></svg>
           </div>
-
           <div class="accordion-body" id="edit-advanced-body">
             <div class="form-group">
               <label for="edit-algorithm">Algorithm</label>
@@ -1430,74 +776,59 @@
             <div class="form-group">
               <label for="edit-digits">Digits</label>
               <select id="edit-digits" class="form-control">
-                <option value="6">6 Digits</option>
-                <option value="8">8 Digits</option>
+                <option value="6">6 digits</option>
+                <option value="8">8 digits</option>
               </select>
             </div>
             <div class="form-group">
-              <label for="edit-period">Period (Seconds)</label>
+              <label for="edit-period">Period (seconds)</label>
               <input type="number" id="edit-period" class="form-control" min="10" max="300">
             </div>
           </div>
         </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+        <div class="modal-actions">
           <button class="btn-secondary" onclick="closeModal('edit-modal')">Cancel</button>
-          <button class="btn-primary" onclick="updateSavedAccount()">Save Changes</button>
+          <button class="btn-primary" onclick="updateSavedAccount()">Save changes</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Custom Confirm Modal Backdrop -->
+  <!-- Confirm Modal -->
   <div class="modal-backdrop" id="confirm-modal" onclick="if(event.target === this) closeModal('confirm-modal')">
     <div class="modal-window" style="max-width: 400px;">
-      <div class="modal-header" style="border: 0; padding: 20px 24px 8px 24px;">
-        <h3 id="confirm-title" style="font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 10px;">
-          Confirm Action
-        </h3>
+      <div class="modal-header" style="padding: 22px 24px 8px;">
+        <h3 id="confirm-title">Confirm action</h3>
       </div>
-      <div class="modal-body" style="padding: 0 24px 20px 24px;">
-        <p id="confirm-msg" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;"></p>
+      <div class="modal-body" style="padding: 0 24px 22px;">
+        <p id="confirm-msg" style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 20px;"></p>
         <div style="display: flex; gap: 12px; justify-content: flex-end;">
-          <button class="btn-secondary" id="confirm-cancel" style="flex: 1; justify-content: center; height: 40px;">Cancel</button>
-          <button class="btn-primary" id="confirm-ok" style="flex: 1; justify-content: center; height: 40px; background: var(--color-danger); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);">Confirm</button>
+          <button class="btn-secondary" id="confirm-cancel" style="flex: 1; justify-content: center;">Cancel</button>
+          <button class="btn-primary" id="confirm-ok" style="flex: 1; justify-content: center;">Confirm</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification Overlay -->
+  <!-- Toast -->
   <div class="toast-container" id="toast">
     <div class="toast-icon" id="toast-icon"></div>
-    <span id="toast-msg">Success Message</span>
+    <span id="toast-msg">Success message</span>
   </div>
 
-  <!-- Hidden Div for QR Image Parsing -->
+  <!-- Hidden QR parser mount -->
   <div id="hidden-qr-reader" style="display: none;"></div>
 
   <!-- Footer -->
   <footer>
-    <p>Fast Authenticator v2.3.0</p>
+    <p>Fast Authenticator v2.4.0</p>
     <p><a href="https://2fa.fast" target="_blank">2fa.fast</a> &bull; Coded by Yurii</p>
   </footer>
 
   <!-- Core JavaScript -->
   <script>
-    // Embedded SVG Icon Constants
-    const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1" /><stop offset="100%" stop-color="#06b6d4" /></linearGradient></defs><rect width="512" height="512" rx="128" fill="#08090c" /><g transform="translate(128, 128)"><rect x="32" y="96" width="192" height="128" rx="24" fill="url(#g)" /><path d="M64 96V72a64 64 0 0 1 128 0v24" stroke="url(#g)" stroke-width="24" fill="none" /><circle cx="128" cy="150" r="16" fill="#08090c" /><path d="M128 166v24" stroke="#08090c" stroke-width="12" stroke-linecap="round" /></g></svg>`;
-
-    // Programmatically link PWA Meta & Icons
-    const faviconLink = document.createElement('link');
-    faviconLink.rel = 'icon';
-    faviconLink.type = 'image/svg+xml';
-    faviconLink.href = `data:image/svg+xml;utf8,${encodeURIComponent(iconSvg)}`;
-    document.head.appendChild(faviconLink);
-
-    const appleIconLink = document.createElement('link');
-    appleIconLink.rel = 'apple-touch-icon';
-    appleIconLink.href = `data:image/svg+xml;utf8,${encodeURIComponent(iconSvg)}`;
-    document.head.appendChild(appleIconLink);
+    // Icons are now linked statically in <head> (icon.svg) so search-engine
+    // crawlers see them without executing JavaScript.
 
     // State Variables
     let accounts = [];
@@ -1558,6 +889,30 @@
         bytes[i] = parseInt(bits.substring(i * 8, (i + 1) * 8), 2);
       }
       return bytes;
+    }
+
+    // 2b. Secret-key validator. A valid Base32 string can still be far too
+    // short to be a real TOTP secret (e.g. "JX" decodes to 1 byte), so we also
+    // enforce a sane minimum length. 8 chars (40 bits) accepts every real-world
+    // secret — Google's are 16 — while rejecting obvious junk.
+    const MIN_SECRET_CHARS = 8;
+    function validateSecret(secret) {
+      const clean = (secret || '').replace(/=+$/, '').replace(/\s/g, '').toUpperCase();
+      if (!clean) {
+        return { ok: false, reason: 'Please enter a secret key.' };
+      }
+      if (clean.length < MIN_SECRET_CHARS) {
+        return { ok: false, reason: `Secret key is too short — at least ${MIN_SECRET_CHARS} characters required.` };
+      }
+      try {
+        const bytes = base32ToBytes(clean);
+        if (bytes.length === 0) {
+          return { ok: false, reason: 'Secret key is too short.' };
+        }
+      } catch (e) {
+        return { ok: false, reason: 'Invalid Base32 secret key (allowed: A–Z, 2–7).' };
+      }
+      return { ok: true };
     }
 
     // 3. Web Crypto key caching engine (bypasses redundant Base32 decodes and importKey operations)
@@ -2090,27 +1445,6 @@
       return otp;
     }
 
-    // Consistent gradient generation for account avatars based on issuer hash
-    function getIssuerColor(issuer) {
-      const name = (issuer || 'A').toUpperCase();
-      let hash = 0;
-      for (let i = 0; i < name.length; i++) {
-        hash = name.charCodeAt(i) + ((hash << 5) - hash);
-      }
-      const colors = [
-        { primary: '#4f46e5', secondary: '#818cf8' }, // Indigo
-        { primary: '#0891b2', secondary: '#22d3ee' }, // Cyan
-        { primary: '#059669', secondary: '#34d399' }, // Emerald
-        { primary: '#ea580c', secondary: '#fb923c' }, // Orange
-        { primary: '#dc2626', secondary: '#f87171' }, // Red
-        { primary: '#db2777', secondary: '#f472b6' }, // Pink
-        { primary: '#7c3aed', secondary: '#a78bfa' }, // Violet
-        { primary: '#2563eb', secondary: '#60a5fa' }  // Blue
-      ];
-      const index = Math.abs(hash) % colors.length;
-      return colors[index];
-    }
-
     // 5. Sound Generators (AudioContext Synthesizer)
     function playBeep(type) {
       try {
@@ -2446,7 +1780,17 @@
             
             await html5QrcodeScanner.start(
               cameraId,
-              { fps: 10, qrbox: { width: 220, height: 220 } },
+              {
+                fps: 10,
+                // Keep the scan region a square that fits the viewfinder; a narrow
+                // camera feed would otherwise clamp the width and make it rectangular.
+                qrbox: (viewfinderWidth, viewfinderHeight) => {
+                  const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+                  const size = Math.max(140, Math.floor(minEdge * 0.7));
+                  return { width: size, height: size };
+                },
+                aspectRatio: 1
+              },
               qrText => {
                 handleDecodedQR(qrText);
                 stopWebcamScanner();
@@ -2520,77 +1864,59 @@
     function createAccountCardHTML(account, isTemp = false) {
       if (account.id === 'instant-temp-acc') {
         return `
-          <div class="account-card" data-account-id="${account.id}" style="flex-direction: column; align-items: stretch; padding: 24px; gap: 16px;">
-            <!-- Main code display -->
-            <div style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-              <div class="pin-code" onclick="copyCode(this.textContent.replace(/\\s/g, ''), this)" style="font-size: 2.8rem; letter-spacing: 2px; color: var(--accent-cyan); font-weight: 700; text-shadow: 0 0 16px rgba(6, 182, 212, 0.4); line-height: 1.2; user-select: all; cursor: pointer;" title="Click to copy current code">
-                ------
-              </div>
-              <div class="next-pin" onclick="copyCode(this.textContent.replace(/\\s/g, ''), this)" style="font-size: 1.3rem; color: var(--text-muted); font-weight: 600; opacity: 0.6; letter-spacing: 1px; cursor: pointer;" title="Click to copy next code">
-                ------
-              </div>
+          <div class="account-card account-card--feature" data-account-id="${account.id}">
+            <div class="feature-code">
+              <div class="pin-code pin-code--xl" onclick="copyCode(this.textContent.replace(/\\s/g, ''), this)" title="Click to copy current code">------</div>
+              <div class="next-pin next-pin--feature" onclick="copyCode(this.textContent.replace(/\\s/g, ''), this)" title="Click to copy next code">------</div>
             </div>
-            
-            <!-- Horizontal progress bar -->
-            <div style="display: flex; align-items: center; gap: 12px; width: 100%; margin: 4px 0;">
-              <div style="flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; position: relative;">
-                <div class="progress-bar-fill" style="width: 0%; height: 100%; background: var(--accent-gradient); border-radius: 10px; transition: width 0.3s ease, background-color 0.3s ease;"></div>
+            <div class="meter">
+              <div class="meter-track">
+                <div class="progress-bar-fill"></div>
               </div>
-              <span class="progress-timer-text-bar" style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); min-width: 28px; text-align: right; font-family: monospace;">--s</span>
+              <span class="progress-timer-text-bar">--s</span>
             </div>
-            
-            <!-- Secret Key -->
-            <div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; word-break: break-all; opacity: 0.55; font-family: monospace; line-height: 1.4; border-top: 1px solid var(--card-border); padding-top: 12px;">
-              Secret: ${escapeHTML(account.secret)}
-            </div>
+            <div class="feature-secret">Secret · ${escapeHTML(account.secret)}</div>
           </div>
         `;
       }
 
-      const colors = getIssuerColor(account.issuer);
       const letter = (account.issuer || 'A').charAt(0).toUpperCase();
-      
+
       return `
         <div class="account-card" data-account-id="${account.id}">
           <div class="account-info">
-            <div class="account-avatar" style="background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)">
-              ${letter}
-            </div>
+            <div class="account-avatar">${letter}</div>
             <div class="account-details">
               <div class="issuer-name">${escapeHTML(account.issuer)}</div>
               <div class="account-label">${escapeHTML(account.label)}</div>
             </div>
           </div>
-          
-          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
-            <div class="code-wrapper">
-              <div class="pin-code" onclick="copyCode(this.textContent.replace(/\\s/g, ''), this)" title="Click to copy current code">
-                ------
-              </div>
-              
-              <div class="timer-container">
-                <svg class="progress-ring" viewBox="0 0 36 36">
-                  <circle class="progress-ring-bg" cx="18" cy="18" r="14" fill="none" stroke-width="3.5"></circle>
-                  <circle class="progress-ring-fg" cx="18" cy="18" r="14" fill="none" stroke-width="3.5" stroke-dasharray="88" stroke-dashoffset="0"></circle>
-                </svg>
-                <span class="progress-timer-text">--</span>
-              </div>
-            </div>
-            <div style="font-size: 0.75rem; color: var(--text-muted); opacity: 0.8; margin-right: 52px; cursor: pointer; user-select: none;" title="Click to copy next code" onclick="copyCode(this.querySelector('.next-pin').textContent.replace(/\\s/g, ''), this.querySelector('.next-pin'))">
-              Next: <span class="next-pin" style="transition: color 0.15s ease;">------</span>
-            </div>
-          </div>
 
-          ${!isTemp ? `
-          <div class="card-actions">
-            <button class="btn-icon" onclick="editAccount('${account.id}')" title="Edit account" style="color: var(--text-secondary); border-color: var(--card-border); margin-right: 4px;">
-              <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-            </button>
-            <button class="btn-icon" onclick="deleteAccount('${account.id}')" title="Delete account" style="color: var(--color-danger); border-color: rgba(239,68,68,0.15)">
-              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            </button>
+          <div class="acc-right">
+            <div class="code-block">
+              <div class="pin-code" onclick="copyCode(this.textContent.replace(/\\s/g, ''), this)" title="Click to copy current code">------</div>
+              <div class="next-row" title="Click to copy next code" onclick="copyCode(this.querySelector('.next-pin').textContent.replace(/\\s/g, ''), this.querySelector('.next-pin'))">Next <span class="next-pin">------</span></div>
+            </div>
+
+            <div class="timer-container">
+              <svg class="progress-ring" viewBox="0 0 36 36">
+                <circle class="progress-ring-bg" cx="18" cy="18" r="14" fill="none" stroke-width="3"></circle>
+                <circle class="progress-ring-fg" cx="18" cy="18" r="14" fill="none" stroke-width="3" stroke-dasharray="88" stroke-dashoffset="0"></circle>
+              </svg>
+              <span class="progress-timer-text">--</span>
+            </div>
+
+            ${!isTemp ? `
+            <div class="card-actions">
+              <button class="btn-icon" onclick="editAccount('${account.id}')" title="Edit account">
+                <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              </button>
+              <button class="btn-icon action-delete" onclick="deleteAccount('${account.id}')" title="Delete account">
+                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
+            ` : ''}
           </div>
-          ` : ''}
         </div>
       `;
     }
@@ -2612,18 +1938,19 @@
       const emptyIllustration = document.getElementById('empty-illustration');
       const emptyTitle = document.getElementById('empty-title');
 
+      // "Quick URL access" card stays visible at all times.
+      emptyFooter.style.display = 'flex';
+
       if (accounts.length === 0) {
         emptyState.style.display = 'flex';
         if (emptyIllustration) emptyIllustration.style.display = 'flex';
         if (emptyTitle) emptyTitle.style.display = 'block';
-        emptyFooter.style.display = 'flex';
         searchPanel.style.display = 'none';
         grid.innerHTML = '';
       } else {
         emptyState.style.display = 'flex';
         if (emptyIllustration) emptyIllustration.style.display = 'none';
         if (emptyTitle) emptyTitle.style.display = 'none';
-        emptyFooter.style.display = 'none';
         searchPanel.style.display = 'block';
         
         if (filtered.length === 0) {
@@ -2659,16 +1986,9 @@
       const digits = parseInt(document.getElementById('input-digits').value);
       const period = parseInt(document.getElementById('input-period').value) || 30;
 
-      if (!secret) {
-        showToast('Please enter a Secret Key.', 'error');
-        return;
-      }
-
-      // Check if base32 is valid
-      try {
-        base32ToBytes(secret);
-      } catch (e) {
-        showToast('Invalid Base32 Secret Key structure.', 'error');
+      const check = validateSecret(secret);
+      if (!check.ok) {
+        showToast(check.reason, 'error');
         return;
       }
 
@@ -2708,23 +2028,18 @@
         if (!trimmed) return;
         
         let account = null;
-        // Parse as raw base32 secret
+        // Parse as raw base32 secret (must pass full secret validation)
         const cleanSecret = trimmed.replace(/\s/g, '').toUpperCase();
-        if (/^[A-Z2-7=]+$/i.test(cleanSecret)) {
-          try {
-            base32ToBytes(cleanSecret); // validate
-            account = {
-              id: 'acc-' + (Date.now() + added + index),
-              issuer: 'Bulk Code',
-              label: 'Key ' + (accounts.length + added + 1),
-              secret: cleanSecret,
-              algorithm: 'SHA-1',
-              digits: 6,
-              period: 30
-            };
-          } catch (e) {
-            // Invalid base32
-          }
+        if (validateSecret(cleanSecret).ok) {
+          account = {
+            id: 'acc-' + (Date.now() + added + index),
+            issuer: 'Bulk Code',
+            label: 'Key ' + (accounts.length + added + 1),
+            secret: cleanSecret,
+            algorithm: 'SHA-1',
+            digits: 6,
+            period: 30
+          };
         }
         
         if (account) {
@@ -2815,18 +2130,12 @@
       const digits = parseInt(document.getElementById('edit-digits').value);
       const period = parseInt(document.getElementById('edit-period').value) || 30;
       
-      if (!secret) {
-        showToast('Please enter a Secret Key.', 'error');
+      const check = validateSecret(secret);
+      if (!check.ok) {
+        showToast(check.reason, 'error');
         return;
       }
-      
-      try {
-        base32ToBytes(secret);
-      } catch (e) {
-        showToast('Invalid Base32 Secret Key structure.', 'error');
-        return;
-      }
-      
+
       accounts[accountIndex] = {
         id,
         issuer: issuer || 'Authenticator',
@@ -2886,10 +2195,15 @@
         }
       }
       
-      // 3. Check Pathname routing e.g. /JBSWY3DPEHPK3PXP
-      const path = window.location.pathname.replace(/^\//, '').trim().replace(/\s/g, '');
-      if (path && path !== 'index.html' && /^[A-Z2-7=]+$/i.test(path)) {
-        return { secret: path.toUpperCase(), source: 'path' };
+      // 3. Check Pathname routing e.g. /JBSWY3DPEHPK3PXP (last segment, so it
+      //    also works when the app is hosted in a sub-directory).
+      //    The path is the weakest signal — a hosting directory name (e.g.
+      //    "2fafast") can also look like Base32 — so only accept it when it is a
+      //    fully valid secret. Otherwise stay silent (no false "invalid" error).
+      const segments = window.location.pathname.split('/').filter(Boolean);
+      const lastSeg = segments.length ? segments[segments.length - 1].trim().replace(/\s/g, '') : '';
+      if (lastSeg && lastSeg !== 'index.html' && validateSecret(lastSeg).ok) {
+        return { secret: lastSeg.toUpperCase(), source: 'path' };
       }
       
       return null;
@@ -2898,7 +2212,13 @@
     function handleURLParams() {
       const urlData = getSecretFromURL();
       if (!urlData) return;
-      
+
+      // Ignore junk secrets coming from the URL (too short / invalid).
+      if (!validateSecret(urlData.secret).ok) {
+        showToast('The link contains an invalid secret key.', 'error');
+        return;
+      }
+
       tempAccount = {
         id: 'temp-url-account',
         secret: urlData.secret,
@@ -2914,11 +2234,12 @@
       document.getElementById('temp-card-container').innerHTML = createAccountCardHTML(tempAccount, true);
       
       
-      // Instant code calculation and automatic clipboard copy!
+      // Just present the code. Don't auto-copy: a clipboard write without a user
+      // gesture is blocked by browsers and would throw a "Failed to copy" error.
+      // The user can tap the code to copy it.
       getAccountOTP(tempAccount).then(otpData => {
         if (otpData && otpData.otp && !otpData.error) {
-          copyCode(otpData.otp);
-          showToast('Code copied to clipboard!', 'success');
+          showToast('Code ready — tap it to copy.', 'success');
         }
       });
     }
@@ -2981,7 +2302,7 @@
           
           let added = 0;
           imported.forEach(item => {
-            if (item.secret) {
+            if (item.secret && validateSecret(item.secret).ok) {
               const finalIssuer = item.issuer || 'Authenticator';
               const finalLabel = item.label || '2FA Code';
               // Avoid duplicates
@@ -3153,6 +2474,15 @@
       document.getElementById(`tab-${tab}`).classList.add('active');
       document.getElementById(`content-${tab}`).classList.add('active');
 
+      // Reset the upload tab so a stale status (e.g. "Decoded successfully!")
+      // from a previous upload isn't shown before a new file is picked.
+      if (tab === 'file') {
+        const status = document.getElementById('file-upload-status');
+        if (status) { status.textContent = ''; status.className = 'status-msg'; }
+        const fileInput = document.getElementById('qr-file-input');
+        if (fileInput) fileInput.value = '';
+      }
+
       // Update footer save button based on active tab
       const saveBtn = document.getElementById('add-modal-save-btn');
       if (saveBtn) {
@@ -3223,10 +2553,10 @@
         return;
       }
       
-      try {
-        base32ToBytes(val);
+      const check = validateSecret(val);
+      if (check.ok) {
         errorEl.style.display = 'none';
-        
+
         instantAccount = {
           id: 'instant-temp-acc',
           secret: val,
@@ -3236,31 +2566,34 @@
           digits: 6,
           period: 30
         };
-        
+
         previewContainer.innerHTML = `
-          <div style="margin-top: 14px; width: 100%; display: flex; flex-direction: column; gap: 10px; text-align: left;">
+          <div style="margin-top: 14px; width: 100%; display: flex; flex-direction: column; gap: 10px;">
             ${createAccountCardHTML(instantAccount, true)}
             <div style="display: flex; gap: 8px; width: 100%;">
-              <button class="btn-primary" onclick="saveInstantAccount()" style="flex: 1; justify-content: center; height: 38px; font-size: 0.85rem;">Save to Device</button>
-              <button class="btn-secondary" onclick="copyInstantShareLink()" style="flex: 1; justify-content: center; height: 38px; font-size: 0.85rem;">Copy Link</button>
+              <button class="btn-primary" onclick="saveInstantAccount()" style="flex: 1; justify-content: center; height: 40px; font-size: 0.85rem;">Save to device</button>
+              <button class="btn-secondary" onclick="copyInstantShareLink()" style="flex: 1; justify-content: center; height: 40px; font-size: 0.85rem;">Copy link</button>
             </div>
           </div>
         `;
-        
+
         delete cardStates[instantAccount.id];
         updateActiveCodes();
-        
+
         // Auto-copy the newly pasted code
         getAccountOTP(instantAccount).then(otpData => {
           if (otpData && otpData.otp && !otpData.error) {
             copyCode(otpData.otp);
           }
         });
-      } catch (err) {
+      } else {
         previewContainer.innerHTML = '';
         instantAccount = null;
-        if (val.length >= 8) {
-          errorEl.textContent = 'Invalid Base32 characters (A-Z, 2-7)';
+        // Show a hint once enough has been typed: bad characters, or a key
+        // that is long enough to clearly be "too short" rather than mid-typing.
+        const invalidChars = /Invalid Base32/.test(check.reason);
+        if ((invalidChars && val.length >= 4) || (!invalidChars && val.length >= MIN_SECRET_CHARS - 1 && val.length < MIN_SECRET_CHARS)) {
+          errorEl.textContent = check.reason;
           errorEl.style.display = 'block';
         } else {
           errorEl.style.display = 'none';
@@ -3280,7 +2613,9 @@
 
     function copyInstantShareLink() {
       if (!instantAccount) return;
-      const shareUrl = `${window.location.origin}${window.location.pathname}?${instantAccount.secret}`;
+      let base = window.location.pathname.replace(/[^/]*$/, ''); // strip file name, keep directory
+      if (!base.endsWith('/')) base += '/';
+      const shareUrl = `${window.location.origin}${base}${instantAccount.secret}`;
       copyTextToClipboard(shareUrl).then(() => {
         playBeep('success');
         showToast('Shareable link copied!', 'success');
@@ -3318,24 +2653,54 @@
 
     // PWA Install prompt interceptor
     let deferredPrompt;
+    const isStandalone = () =>
+      window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const isIOS = () =>
+      /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+
+    function showInstallBtn() {
+      const btn = document.getElementById('pwa-install-btn');
+      if (btn && !isStandalone()) btn.style.display = 'inline-flex';
+    }
+    function hideInstallBtn() {
+      const btn = document.getElementById('pwa-install-btn');
+      if (btn) btn.style.display = 'none';
+    }
+
+    // Chrome / Edge / Android: capture the native prompt and reveal the button.
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      const installBtn = document.getElementById('pwa-install-btn');
-      if (installBtn) installBtn.style.display = 'flex';
+      showInstallBtn();
+    });
+
+    // iOS Safari never fires beforeinstallprompt, so show the button with manual
+    // "Add to Home Screen" guidance when the app isn't already installed.
+    if (isIOS() && !isStandalone()) {
+      window.addEventListener('load', showInstallBtn);
+    }
+
+    // Hide the button once the app has been installed.
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      hideInstallBtn();
+      showToast('App installed.', 'success');
     });
 
     function installPWA() {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('PWA installation accepted');
-        }
-        deferredPrompt = null;
-        const installBtn = document.getElementById('pwa-install-btn');
-        if (installBtn) installBtn.style.display = 'none';
-      });
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+          hideInstallBtn();
+        });
+        return;
+      }
+      if (isIOS()) {
+        showToast('Tap the Share icon, then "Add to Home Screen".', 'success');
+        return;
+      }
+      showToast('Open the browser menu and choose "Install app".', 'success');
     }
   </script>
 </body>
